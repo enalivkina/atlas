@@ -1,0 +1,46 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Atlas\Validator\Rule;
+
+use Atlas\Validator\Contract\RuleValidatorInterface;
+use Atlas\Validator\Exception\ValidationException;
+use InvalidArgumentException;
+
+final class StringValidator implements RuleValidatorInterface
+{
+    public function validate(mixed $value, array $options = []): void
+    {
+        if (is_string($value) === false) {
+            throw new ValidationException($options['errorMessage'] ?? 'Значение должно быть строкой');
+        }
+
+        $len = mb_strlen($value);
+        $min = $options['min'] ?? null;
+        $max = $options['max'] ?? null;
+        $pattern = $options['pattern'] ?? null;
+
+        if ($min !== null && $len < $min) {
+            throw new ValidationException($options['minErrorMessage'] ?? "Значение должно быть не короче минимальной длины: $min");
+        }
+
+        if ($max !== null && $len > $max) {
+            throw new ValidationException($options['maxErrorMessage'] ?? "Значение должно быть не длиннее максимальной длины: $max");
+        }
+
+        if (is_null($pattern) === true) {
+            return;
+        }
+
+        $pregResult = preg_match($pattern, $value);
+
+        if ($pregResult === false) {
+            throw new InvalidArgumentException('Некорректно задано правило паттерна');
+        }
+
+        if ($pregResult === 0) {
+            throw new ValidationException($options['patternErrorMessage'] ?? 'Значение не соответсвует паттерну');
+        }
+    }
+}

@@ -1,0 +1,16 @@
+services:
+  php:
+    image: ${DOCKER_REGISTRY}/${DOCKER_PHP_IMAGE_NAME}:${DOCKER_IMAGE_VERSION}
+    container_name: atlas-php
+    environment:
+      TZ: ${TZ}
+      INDEX_NAME: ${INDEX_NAME}
+      APP_ENV: ${APP_ENV}
+      APP_DEBUG: ${APP_DEBUG}
+    volumes:
+      - ./:/app
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "2"
+        max-size: "100m"
