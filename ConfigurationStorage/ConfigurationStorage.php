@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Atlas\ConfigurationStorage;
 
-final class ConfigurationStorage
+final class ConfigurationStorage implements ConfigurationStorageInterface
 {
     private static ?self $instance = null;
 

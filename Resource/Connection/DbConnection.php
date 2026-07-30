@@ -6,8 +6,8 @@ namespace Atlas\Resource\Connection;
 
 use Atlas\Resource\Connection\Contract\ConnectionInterface;
 use PDO;
-use PDOException;
 use PDOStatement;
+use Atlas\Resource\Query\QueryBuilderInterface;
 
 final class DbConnection implements ConnectionInterface
 {
@@ -150,7 +150,7 @@ final class DbConnection implements ConnectionInterface
         return $this->lastInsertId;
     }
 
-    private function executeQuery(DataBaseQueryBuilderInterface $query): PDOStatement
+    private function executeQuery(QueryBuilderInterface $query): PDOStatement
     {
         $statementParams = $query->getStatement();
 

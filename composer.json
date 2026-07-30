@@ -23,7 +23,8 @@
     "psr/container": "^2.0",
     "ext-posix": "*",
     "ext-mbstring": "*",
-    "firebase/php-jwt": "*"
+    "firebase/php-jwt": "*",
+    "ext-pdo": "*"
   },
   "scripts": {
     "test": "phpunit"

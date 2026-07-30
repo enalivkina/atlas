@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Atlas\Resource\Db;
 
+use Atlas\Resource\Connection\Contract\ConnectionInterface;
 use Atlas\Resource\Contract\ResourceWriterInterface;
 use InvalidArgumentException;
 
@@ -13,7 +14,7 @@ final class ResourceWriter implements ResourceWriterInterface
     private array $accessibleFields = [];
 
     public function __construct(
-        private readonly DataBaseConnectionInterface $connection,
+        private readonly ConnectionInterface $connection,
     ) {}
 
     public function setResourceName(string $name): static

@@ -8,6 +8,7 @@ use Psr\Container\ContainerInterface as PsrContainerInterface;
 
 interface ContainerInterface extends PsrContainerInterface
 {
+    public static function create(array $config = []): self;
     /**
      * Создание экземпляра объекта в зависимости от имени класса
      *
@@ -27,4 +28,8 @@ interface ContainerInterface extends PsrContainerInterface
      * @return mixed Результат выполнения обработчика
      */
     public function call(object|string $handler, string $method, array $args = []): mixed;
+
+    public function registerSingleton(string|callable $identifier, string $dependencyName, array $args = []): void;
+    public function get(string $id): object;
+    public function has(string $id): bool;
 }

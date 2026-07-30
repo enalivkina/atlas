@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Atlas\Logger;
 
+use Atlas\EventDispatcher\Contract\EventDispatcherInterface;
 use Atlas\Logger\Enum\LogContextEvent;
 
 final class StdOutLogger extends AbstractLogger

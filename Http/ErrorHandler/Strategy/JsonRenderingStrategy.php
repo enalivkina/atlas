@@ -21,7 +21,7 @@ final readonly class JsonRenderingStrategy implements RenderingStrategyInterface
     {
         $response = $this->container->get(ServerResponseInterface::class);
         $response = $response->withHeader('Content-Type', 'application/json');
-        $this->container->registerSingleton(ServerResponseInterface::class, fn(): ServerResponseInterface => $response);
+        $this->container->registerSingleton(fn(): ServerResponseInterface => $response, ServerResponseInterface::class);
 
         $message = $throwable instanceof HttpException === true ? $throwable->getMessage() : $throwable->getMessage();
 

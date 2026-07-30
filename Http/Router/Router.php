@@ -158,8 +158,8 @@ final class Router implements HttpRouterInterface, MiddlewareAssignableInterface
                 ServerRequestInterface $request,
                 ServerResponseInterface $response
             ) {
-                $this->container->registerSingleton(ServerRequestInterface::class, fn () => $request);
-                $this->container->registerSingleton(ServerResponseInterface::class, fn () => $response);
+                $this->container->registerSingleton(fn () => $request, ServerRequestInterface::class, );
+                $this->container->registerSingleton(fn () => $response, ServerResponseInterface::class);
             }
         );
 

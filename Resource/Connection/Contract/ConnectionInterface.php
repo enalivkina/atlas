@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Atlas\Resource\Connection\Contract;
 
+use Atlas\Resource\Query\QueryBuilderInterface;
+
 interface ConnectionInterface
 {
     public function select(QueryBuilderInterface $query): array;

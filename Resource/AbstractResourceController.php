@@ -22,6 +22,7 @@ use Atlas\Resource\FormRequest\Contract\FormRequestFactoryInterface;
 use Atlas\Resource\FormRequest\Contract\FormRequestInterface;
 use Atlas\Resource\FormRequest\FormRequest;
 use InvalidArgumentException;
+use Psr\Http\Message\ServerRequestInterface;
 
 abstract class AbstractResourceController
 {
@@ -191,7 +192,7 @@ abstract class AbstractResourceController
         $form->validate();
 
         if (empty($form->getErrors()) === false) {
-            throw new HttpBadRequestException($form->getErrors());
+            throw new HttpBadRequestException(json_encode($form->getErrors(), JSON_UNESCAPED_UNICODE));
         }
 
         $this->eventDispatcher->trigger(ResourceEvent::BEFORE_CREATE->value, new Event([

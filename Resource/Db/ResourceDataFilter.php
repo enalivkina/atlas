@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Atlas\Resource\Db;
 
+use Atlas\Resource\Connection\Contract\ConnectionInterface;
 use Atlas\Resource\Contract\ResourceDataFilterInterface;
+use Atlas\Resource\Query\MySql\DbQueryBuilderInterface;
 use InvalidArgumentException;
 
 final class ResourceDataFilter implements ResourceDataFilterInterface
@@ -15,8 +17,8 @@ final class ResourceDataFilter implements ResourceDataFilterInterface
     private array $relationships = [];
 
     public function __construct(
-        private readonly DataBaseConnectionInterface $connection,
-        private readonly DataBaseQueryBuilderInterface $queryBuilder,
+        private readonly ConnectionInterface $connection,
+        private readonly DbQueryBuilderInterface $queryBuilder,
     ) {}
 
     public function setResourceName(string $name): static

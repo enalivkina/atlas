@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Atlas\Http\ErrorHandler;
 
 use Atlas\Common\Contract\ErrorHandlerInterface;
-use Atlas\ConfigurationStorage\ConfigurationStorage;
+use Atlas\ConfigurationStorage\ConfigurationStorageInterface;
 use Atlas\Container\ContainerInterface;
 use Atlas\Http\Enum\ContentType;
 use Atlas\Http\ErrorHandler\Strategy\HtmlRenderingStrategy;
@@ -27,7 +27,7 @@ final class HttpErrorHandler implements ErrorHandlerInterface
     public function __construct(
         private readonly ViewInterface $view,
         private readonly DebugTagStorageInterface $debugTagStorage,
-        private readonly ConfigurationStorage $configurationStorage,
+        private readonly ConfigurationStorageInterface $configurationStorage,
         private readonly ContainerInterface $container,
         array $renderingStrategies = [],
         private string $mode = ContentType::HTML->value,
@@ -52,7 +52,7 @@ final class HttpErrorHandler implements ErrorHandlerInterface
                 ['throwable' => $throwable],
             );
         } catch (ViewNotFoundException | StrategyNotFoundException) {
-            return $this->view->render('@framework/http/error', [
+            return $this->view->render('@framework/Http/ErrorHandler/Views/index', [
                 'message' => $throwable->getMessage(),
                 'trace' => str_replace(["\n", ": "], ["\n\n", ":\n"], $throwable->getTraceAsString()),
                 'type' => $throwable::class,

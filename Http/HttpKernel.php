@@ -47,6 +47,7 @@ final class HttpKernel implements HttpKernelInterface
 
             if ($result instanceof ServerResponseInterface === true) {
                 $statusCode = $result->getStatusCode();
+                $responseContentType = 'text/html; charset=utf-8';
                 $message = $result->getBody();
             }
 
@@ -109,10 +110,12 @@ final class HttpKernel implements HttpKernelInterface
 
         $contentTypeBase = trim(explode(';', $contentType)[0]);
 
+        $acceptTypes = explode(',', $acceptTypes[0]);
+
         foreach ($acceptTypes as $acceptType) {
             $acceptTypeBase = trim(explode(';', $acceptType)[0]);
             $regex = '/^' . str_replace('\*', '.*', preg_quote($acceptTypeBase, '/')) . '$/';
-
+            
             if (preg_match($regex, $contentTypeBase) === 1) {
                 return true;
             }
