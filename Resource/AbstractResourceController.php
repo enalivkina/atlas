@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Atlas\Resource;
 
 use Atlas\EventDispatcher\Contract\EventDispatcherInterface;
-use Atlas\EventDispatcher\Event;
+use Atlas\EventDispatcher\Message;
 use Atlas\Http\Exceptions\HttpBadRequestException;
 use Atlas\Http\Exceptions\HttpForbiddenException;
 use Atlas\Http\Exceptions\HttpNotFoundException;
@@ -135,7 +135,7 @@ abstract class AbstractResourceController
 
         $conditions = $this->request->getQueryParams();
 
-        $this->eventDispatcher->trigger(ResourceEvent::LIST_REQUEST->value, new Event([
+        $this->eventDispatcher->trigger(ResourceEvent::LIST_REQUEST->value, new Message([
             'resource' => $this->getResourceName(),
             'filters' => $conditions['filter'] ?? null,
             'fields' => $conditions['fields'] ?? $this->getAccessibleFields(),
@@ -168,7 +168,7 @@ abstract class AbstractResourceController
         $conditions = $this->request->getQueryParams();
         $conditions['filter'] = ['id' => ['$eq' => $id]];
 
-        $this->eventDispatcher->trigger(ResourceEvent::VIEW_REQUEST->value, new Event([
+        $this->eventDispatcher->trigger(ResourceEvent::VIEW_REQUEST->value, new Message([
             'resource' => $this->getResourceName(),
             'id' => $id,
             'fields' => $conditions['fields'] ?? $this->getAccessibleFields(),
@@ -195,7 +195,7 @@ abstract class AbstractResourceController
             throw new HttpBadRequestException(json_encode($form->getErrors(), JSON_UNESCAPED_UNICODE));
         }
 
-        $this->eventDispatcher->trigger(ResourceEvent::BEFORE_CREATE->value, new Event([
+        $this->eventDispatcher->trigger(ResourceEvent::BEFORE_CREATE->value, new Message([
             'resource' => $this->getResourceName(),
             'values' => $form->getValues(),
         ]));
@@ -206,7 +206,7 @@ abstract class AbstractResourceController
             throw new HttpBadRequestException($exception->getMessage());
         }
 
-        $this->eventDispatcher->trigger(ResourceEvent::CREATED->value, new Event([
+        $this->eventDispatcher->trigger(ResourceEvent::CREATED->value, new Message([
             'resource' => $this->getResourceName(),
             'id' => $createdId,
             'values' => $form->getValues(),
@@ -232,7 +232,7 @@ abstract class AbstractResourceController
             throw new HttpBadRequestException($form->getErrors());
         }
 
-        $this->eventDispatcher->trigger(ResourceEvent::BEFORE_UPDATE->value, new Event([
+        $this->eventDispatcher->trigger(ResourceEvent::BEFORE_UPDATE->value, new Message([
             'resource' => $this->getResourceName(),
             'id' => $id,
             'values' => $form->getValues(),
@@ -248,7 +248,7 @@ abstract class AbstractResourceController
             throw new HttpNotFoundException();
         }
 
-        $this->eventDispatcher->trigger(ResourceEvent::UPDATED->value, new Event([
+        $this->eventDispatcher->trigger(ResourceEvent::UPDATED->value, new Message([
             'resource' => $this->getResourceName(),
             'id' => $id,
             'values' => $form->getValues(),
@@ -276,7 +276,7 @@ abstract class AbstractResourceController
             throw new HttpBadRequestException($form->getErrors());
         }
 
-        $this->eventDispatcher->trigger(ResourceEvent::BEFORE_UPDATE->value, new Event([
+        $this->eventDispatcher->trigger(ResourceEvent::BEFORE_UPDATE->value, new Message([
             'resource' => $this->getResourceName(),
             'id' => $id,
             'values' => $form->getValues(),
@@ -292,7 +292,7 @@ abstract class AbstractResourceController
             throw new HttpNotFoundException();
         }
 
-        $this->eventDispatcher->trigger(ResourceEvent::UPDATED->value, new Event([
+        $this->eventDispatcher->trigger(ResourceEvent::UPDATED->value, new Message([
             'resource' => $this->getResourceName(),
             'id' => $id,
             'values' => $form->getValues(),
@@ -309,7 +309,7 @@ abstract class AbstractResourceController
     {
         $this->checkCallAvailability(ResourceActionType::DELETE);
 
-        $this->eventDispatcher->trigger(ResourceEvent::BEFORE_DELETE->value, new Event([
+        $this->eventDispatcher->trigger(ResourceEvent::BEFORE_DELETE->value, new Message([
             'resource' => $this->getResourceName(),
             'id' => $id,
         ]));
@@ -320,7 +320,7 @@ abstract class AbstractResourceController
             throw new HttpNotFoundException();
         }
 
-        $this->eventDispatcher->trigger(ResourceEvent::DELETED->value, new Event([
+        $this->eventDispatcher->trigger(ResourceEvent::DELETED->value, new Message([
             'resource' => $this->getResourceName(),
             'id' => $id,
         ]));

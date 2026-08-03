@@ -11,7 +11,7 @@ use Atlas\Console\Dto\OptionDTO;
 use Atlas\Console\Enum\ConsoleEvent;
 use Atlas\EventDispatcher\Contract\EventDispatcherInterface;
 use Atlas\EventDispatcher\Contract\ObserverInterface;
-use Atlas\EventDispatcher\Event;
+use Atlas\EventDispatcher\Message;
 
 final class CommandDetachOptionPlugin implements ConsoleInputPluginInterface, ObserverInterface
 {
@@ -27,10 +27,10 @@ final class CommandDetachOptionPlugin implements ConsoleInputPluginInterface, Ob
     {
         $input->addDefaultOption($this->option);
 
-        $dispatcher->attach(ConsoleEvent::INPUT_AFTER_PARSE->value, self::class);
+        $dispatcher->attach(ConsoleEvent::INPUT_AFTER_PARSE->value, $this);
     }
 
-    public function observe(Event $event): void
+    public function observe(Message $event): void
     {
         /**
          * @var ConsoleInputInterface $input
