@@ -28,7 +28,7 @@ final class CommandHelpOptionPlugin implements ConsoleInputPluginInterface, Obse
 
     public function init(ConsoleInputInterface $input, EventDispatcherInterface $dispatcher): void
     {
-        $input->addDefaultOption($this->option);
+        $input->addDefaultOption($this->option->name, $this->option->description);
 
         $dispatcher->attach(ConsoleEvent::INPUT_AFTER_PARSE->value, $this);
     }

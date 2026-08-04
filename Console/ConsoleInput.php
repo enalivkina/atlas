@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Atlas\Console;
 
 use Atlas\Console\Command\CommandDefinition;
+use Atlas\Console\Contract\ConsoleCommandInterface;
 use Atlas\Console\Contract\ConsoleInputInterface;
-use Atlas\Console\Dto\OptionDTO;
+use Atlas\Console\Contract\ConsoleInputPluginInterface;
+use Atlas\Console\Enum\ConsoleEvent;
 use Atlas\Container\ContainerInterface;
 use Atlas\EventDispatcher\Contract\EventDispatcherInterface;
+use Atlas\EventDispatcher\Message;
 
 final class ConsoleInput implements ConsoleInputInterface
 {
@@ -22,9 +25,6 @@ final class ConsoleInput implements ConsoleInputInterface
      */
     private array $arguments = [];
 
-    /**
-     * @var OptionDTO[] опции, доступные для каждой команды по умолчанию
-     */
     private array $defaultOptions = [];
 
     /**
@@ -74,18 +74,18 @@ final class ConsoleInput implements ConsoleInputInterface
         $this->arguments = [];
         $this->options = array_fill_keys(array_keys($this->defaultOptions), false);
 
-        $this->dispatcher->trigger(ConsoleEvent::CONSOLE_INPUT_BEFORE_PARSE, new Message($this));
+        $this->dispatcher->trigger(ConsoleEvent::INPUT_BEFORE_PARSE->value, new Message($this));
 
         $this->definition = new CommandDefinition($command::getSignature(), $command::getDescription());
 
         $this->parse();
 
-        $this->dispatcher->trigger(ConsoleEvent::CONSOLE_INPUT_AFTER_PARSE, new Message($this));
+        $this->dispatcher->trigger(ConsoleEvent::INPUT_AFTER_PARSE->value, new Message($this));
 
         $this->validate();
         $this->setDefaults();
 
-        $this->dispatcher->trigger(ConsoleEvent::CONSOLE_INPUT_AFTER_VALIDATE, new Message($this));
+        $this->dispatcher->trigger(ConsoleEvent::INPUT_AFTER_VALIDATE->value, new Message($this));
     }
 
     public function setArgumentValue(string $name, null|string $value): void
@@ -107,23 +107,14 @@ final class ConsoleInput implements ConsoleInputInterface
         return $this->arguments[$name];
     }
 
-    public function addDefaultOption(OptionDTO $optionDto): void
+    public function addDefaultOption(string $name, string $description): void
     {
-        $this->defaultOptions[$optionDto->name] = $optionDto;
+        $this->defaultOptions[$name] = $description;
     }
 
     public function hasOption(string $name): bool
     {
         return array_key_exists($name, $this->options) === true && $this->options[$name] !== false;
-    }
-
-    public function getOptionValue(string $name): bool|string
-    {
-        if (array_key_exists($name, $this->options) === false) {
-            return false;
-        }
-
-        return $this->options[$name];
     }
 
     public function getDefaultOptions(): array

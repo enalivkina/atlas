@@ -25,7 +25,7 @@ final class CommandSaveFilePlugin implements ObserverInterface, ConsoleInputPlug
 
     public function init(ConsoleInputInterface $input, EventDispatcherInterface $dispatcher): void
     {
-        $input->addDefaultOption($this->option);
+        $input->addDefaultOption($this->option->name, $this->option->description);
 
         $dispatcher->attach(ConsoleEvent::INPUT_AFTER_VALIDATE->value, $this);
     }
@@ -40,9 +40,5 @@ final class CommandSaveFilePlugin implements ObserverInterface, ConsoleInputPlug
         if ($input->hasOption($this->option->name) === false) {
             return;
         }
-
-        $file = $input->getOptionValue($this->option->name);
-
-        $this->output->setStdOut($file);
     }
 }
