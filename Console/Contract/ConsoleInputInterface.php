@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Atlas\Console\Contract;
 
 use Atlas\Console\Command\CommandDefinition;
-use Atlas\Console\Dto\OptionDTO;
 
 interface ConsoleInputInterface
 {
@@ -84,7 +83,7 @@ interface ConsoleInputInterface
     /**
      * Получить опции по умолчанию
      *
-     * @return OptionDTO[]
+     * @return array
      */
     public function getDefaultOptions(): array;
 

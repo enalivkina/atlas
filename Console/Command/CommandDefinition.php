@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Atlas\Console\Command;
 
-use Atlas\Console\Dto\ArgumentDTO;
 use Atlas\Console\Dto\CommandInfoDTO;
-use Atlas\Console\Dto\OptionDTO;
 
 final class CommandDefinition
 {
@@ -16,16 +14,8 @@ final class CommandDefinition
      */
     private CommandInfoDTO $commandInfoDTO;
 
-    /**
-     * Аргументы команды
-     * @var ArgumentDTO[]
-     */
     private array $arguments = [];
 
-    /**
-     * Опции команды
-     * @var OptionDTO[]
-     */
     private array $options = [];
 
     public function __construct(string $signature, string $description)
@@ -89,22 +79,22 @@ final class CommandDefinition
      * Возврат параметров, определенных для аргумента
      *
      * @param string $name имя аругмента
-     * @return ArgumentDTO|null
+     * @return array
      */
-    public function getArgumentDefinition(string $name): ?ArgumentDTO
+    public function getArgumentDefinition(string $name): array
     {
-        return $this->arguments[$name] ?? null;
+        return $this->arguments[$name] ?? [];
     }
 
     /**
      * Возврат параметров, определенных для опции
      *
      * @param string $name имя опции
-     * @return OptionDTO|null
+     * @return array
      */
-    public function getOptionDefinition(string $name): ?OptionDTO
+    public function getOptionDefinition(string $name): array
     {
-        return $this->options[$name] ?? null;
+        return $this->options[$name] ?? [];
     }
 
     /**
@@ -115,7 +105,7 @@ final class CommandDefinition
      */
     public function isRequired(string $name): bool
     {
-        return isset($this->arguments[$name]) === true && $this->arguments[$name]->required === true;
+        return isset($this->arguments[$name]) === true && $this->arguments[$name]['required'] === true;
     }
 
     /**
@@ -127,7 +117,7 @@ final class CommandDefinition
      */
     public function getDefaultValue(string $name): mixed
     {
-        return ($this->arguments[$name] ?? null)?->default;
+        return ($this->arguments[$name] ?? null)['default'];
     }
 
     /**
@@ -182,10 +172,13 @@ final class CommandDefinition
             throw new \InvalidArgumentException("Опция '$name' уже определена");
         }
 
-        $optionDTO = new OptionDTO($name, str_contains($option, '='));
+        $optionDTO = [
+            'name' => $name,
+            'hasValue' => str_contains($option, '='),
+        ];
 
         if (preg_match('/:(.*)$/', $option, $descriptionMatch) === 1) {
-            $optionDTO->description = trim($descriptionMatch[1]);
+            $optionDTO['description'] = trim($descriptionMatch[1]);
         }
 
         $this->options[$name] = $optionDTO;
@@ -209,14 +202,14 @@ final class CommandDefinition
             throw new \InvalidArgumentException("Аргумент '$name' уже определен");
         }
 
-        $argumentDTO = new ArgumentDTO($name, str_contains($arg, '?') === false);
+        $argumentDTO = ['name' => $name, 'required' => str_contains($arg, '?') === false];
 
         if (preg_match('/:(.*)$/', $arg, $descriptionMatch) === 1) {
-            $argumentDTO->description = trim($descriptionMatch[1]);
+            $argumentDTO['description'] = trim($descriptionMatch[1]);
         }
 
         if (preg_match('/=(\w+)/', $arg, $defaultMatch) === 1) {
-            $argumentDTO->default = $defaultMatch[1];
+            $argumentDTO['default'] = $defaultMatch[1];
         }
 
         $this->arguments[$name] = $argumentDTO;
