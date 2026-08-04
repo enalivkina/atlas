@@ -77,16 +77,13 @@ final class Router implements HttpRouterInterface, MiddlewareAssignable
     {
         $method = strtoupper($method);
         $fullPath = $this->buildFullPath($route);
-        $regex = $this->buildRegexPath($fullPath);
 
         $addRoute = new Route(
-            $method,
-            $fullPath,
-            $regex,
-            $this->resolveHandler($handler),
-            $this->middlewares,
-            $this->prepareParams($route),
-            $this->groupStack,
+            method: $method,
+            path: $fullPath,
+            params: $this->prepareParams($route),
+            handler: $this->resolveHandler($handler),
+            middlewares: $this->middlewares,
         );
 
         $this->routes[$method][$fullPath] = $addRoute;
@@ -182,22 +179,18 @@ final class Router implements HttpRouterInterface, MiddlewareAssignable
     /**
      * Формирование массива параметров вызовов обработчика маршрута
      *
-     * @param callable|string|array $handler обработчик - коллбек функция
+     * @param callable|string $handler обработчик - коллбек функция
      * или неймспейс класса в формате 'Неймспейс::метод'
-     * @return array
+     * @return callable|string
      * Пример для callable:
      * [Closure, '__invoke']
      * Пример для string:
      * ['Неймспейс', 'метод'];
      */
-    private function resolveHandler(callable|string|array $handler): array
+    private function resolveHandler(callable|string $handler): callable|string
     {
         if (is_callable($handler) === true) {
             return [$handler(...), '__invoke'];
-        }
-
-        if (is_array($handler) === true) {
-            return $handler;
         }
 
         if (str_contains($handler, '::') === true) {
@@ -329,26 +322,5 @@ final class Router implements HttpRouterInterface, MiddlewareAssignable
         }
 
         return $fullPath . $pathOnly;
-    }
-
-    /**
-     * Построение регулярки для пути с path параметрами на основе шаблона
-     *
-     * @param string $routeTemplate шаблон, пример: '/path/delete/{name}?{id}'
-     * @return string регулярка, пример '#^/path/delete/(?P<name>[^/]+)$#'
-     */
-    private function buildRegexPath(string $routeTemplate): string
-    {
-        $regex = preg_replace_callback(
-            '/\{(\??):(\w+)(?:\|(\w+))?(?:=(\w+))?}/',
-            function (array $match): string {
-                $name = $match[2];
-
-                return "(?P<{$name}>[^/]+)";
-            },
-            explode('?', $routeTemplate, 2)[0]
-        );
-
-        return '#^' . $regex . '$#';
     }
 }
