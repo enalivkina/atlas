@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Atlas\Resource\Query\MySql;
 
 use Atlas\Resource\Query\Operator;
+use Atlas\Resource\Query\QueryBuilderInterface;
+use Atlas\Resource\Query\StatementParameterInterface;
 use InvalidArgumentException;
 
-final class DbQueryBuilder implements DbQueryBuilderInterface
+final class DbQueryBuilder implements QueryBuilderInterface
 {
     private ?string $select = null;
     private ?string $from = null;
@@ -284,7 +286,7 @@ final class DbQueryBuilder implements DbQueryBuilderInterface
     /**
      * @return StatementParameter
      */
-    public function getStatement(): StatementParameter
+    public function getStatement(): StatementParameterInterface
     {
         if ($this->originalResourceName === null) {
             throw new InvalidArgumentException('Имя ресурса не задано');
@@ -369,5 +371,14 @@ final class DbQueryBuilder implements DbQueryBuilderInterface
         }
 
         return $sql;
+    }
+
+    public function whereIn(string $column, array $values): static
+    {
+        $this->where = null;
+
+        $this->where = ' WHERE ' . $column . ' IN ( ' . implode(', ', $values) . ' )';
+
+        return $this;
     }
 }

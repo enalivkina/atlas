@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Atlas\Resource\Query\File;
 
 use Atlas\Resource\Query\Operator;
+use Atlas\Resource\Query\QueryBuilderInterface;
+use Atlas\Resource\Query\StatementParameterInterface;
 use BadMethodCallException;
 use InvalidArgumentException;
 
-final class FileQueryBuilder implements FileQueryBuilderInterface
+final class FileQueryBuilder implements QueryBuilderInterface
 {
     private ?string $resource = null;
     private array $selectFields = [];
@@ -17,7 +19,7 @@ final class FileQueryBuilder implements FileQueryBuilderInterface
     private ?int $limit = null;
     private ?int $offset = null;
 
-    public function getStatement(): StatementParameter
+    public function getStatement(): StatementParameterInterface
     {
         return new StatementParameter(
             $this->resource,

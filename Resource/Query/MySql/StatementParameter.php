@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Atlas\Resource\Query\MySql;
 
-final readonly class StatementParameter
+use Atlas\Resource\Query\StatementParameterInterface;
+
+final readonly class StatementParameter implements StatementParameterInterface
 {
     public function __construct(
         public string $sql,
