@@ -9,6 +9,8 @@ use Atlas\Http\Router\Contract\MiddlewareAssignable;
 final class RouteGroup implements MiddlewareAssignable
 {
     private array $middlewares = [];
+    private array $routes = [];
+    private array $groups = [];
 
     public function __construct(private readonly string $name) {}
 
@@ -19,9 +21,14 @@ final class RouteGroup implements MiddlewareAssignable
         return $this;
     }
 
-    public function getMiddlewares(): array
+    public function addRoute(Route $route): void
     {
-        return $this->middlewares;
+        $this->routes[] = $route;
+    }
+
+    public function addGroup(RouteGroup $group): void
+    {
+        $this->groups[] = $group;
     }
 
     public function getName(): string
