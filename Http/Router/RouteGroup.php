@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Atlas\Http\Router;
 
-use Atlas\Http\Router\Contract\MiddlewareAssignableInterface;
+use Atlas\Http\Router\Contract\MiddlewareAssignable;
 
-final class RouteGroup implements MiddlewareAssignableInterface
+final class RouteGroup implements MiddlewareAssignable
 {
     private array $middlewares = [];
 
     public function __construct(private readonly string $name) {}
 
-    public function addMiddleware(callable|string $middleware): MiddlewareAssignableInterface
+    public function addMiddleware(callable|string $middleware): MiddlewareAssignable
     {
         $this->middlewares[] = $middleware;
 

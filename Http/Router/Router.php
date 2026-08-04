@@ -9,13 +9,13 @@ use Atlas\Http\Contract\ServerResponseInterface;
 use Atlas\Http\Exceptions\HttpBadRequestException;
 use Atlas\Http\Exceptions\HttpNotFoundException;
 use Atlas\Http\Router\Contract\HttpRouterInterface;
-use Atlas\Http\Router\Contract\MiddlewareAssignableInterface;
+use Atlas\Http\Router\Contract\MiddlewareAssignable;
 use Atlas\Validator\Contract\ValidatorInterface;
 use Atlas\Validator\Exception\ValidationException;
 use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class Router implements HttpRouterInterface, MiddlewareAssignableInterface
+final class Router implements HttpRouterInterface, MiddlewareAssignable
 {
     private array $routes = [];
     private array $middlewares = [];
@@ -30,34 +30,34 @@ final class Router implements HttpRouterInterface, MiddlewareAssignableInterface
         private readonly ValidatorInterface $validator,
     ) {}
 
-    public function addMiddleware(callable|string $middleware): MiddlewareAssignableInterface
+    public function addMiddleware(callable|string $middleware): MiddlewareAssignable
     {
         $this->middlewares[] = $middleware;
 
         return $this;
     }
 
-    public function get(string $route, callable|string|array $handler): Route
+    public function get(string $route, string|callable $handler): Route
     {
         return $this->add('GET', $route, $handler);
     }
 
-    public function post(string $route, callable|string|array $handler): Route
+    public function post(string $route, string|callable $handler): Route
     {
         return $this->add('POST', $route, $handler);
     }
 
-    public function put(string $route, callable|string|array $handler): Route
+    public function put(string $route, string|callable $handler): Route
     {
         return $this->add('PUT', $route, $handler);
     }
 
-    public function patch(string $route, callable|string|array $handler): Route
+    public function patch(string $route, string|callable $handler): Route
     {
         return $this->add('PATCH', $route, $handler);
     }
 
-    public function delete(string $route, callable|string|array $handler): Route
+    public function delete(string $route, string|callable $handler): Route
     {
         return $this->add('DELETE', $route, $handler);
     }
@@ -73,28 +73,39 @@ final class Router implements HttpRouterInterface, MiddlewareAssignableInterface
         return array_pop($this->groupStack);
     }
 
-    public function add(string $method, string $path, string|callable|array $handler): Route
+    public function add(string $method, string $route, string|callable $handler): Route
     {
         $method = strtoupper($method);
-        $fullPath = $this->buildFullPath($path);
+        $fullPath = $this->buildFullPath($route);
         $regex = $this->buildRegexPath($fullPath);
 
-        $route = new Route(
+        $addRoute = new Route(
             $method,
             $fullPath,
             $regex,
             $this->resolveHandler($handler),
             $this->middlewares,
-            $this->prepareParams($path),
+            $this->prepareParams($route),
             $this->groupStack,
         );
 
-        $this->routes[$method][$fullPath] = $route;
+        $this->routes[$method][$fullPath] = $addRoute;
 
-        return $route;
+        return $addRoute;
     }
 
-    public function has(string $method, string $path): bool
+    /**
+     * @param string $name
+     * @param string $controller
+     * @param array $config
+     * @return void
+     */
+    public function addResource(string $name, string $controller, array $config = []): void
+    {
+        (new Resource($name, $controller, $config))->build($this);
+    }
+
+    private function has(string $method, string $path): bool
     {
         $method = strtoupper($method);
 
@@ -339,16 +350,5 @@ final class Router implements HttpRouterInterface, MiddlewareAssignableInterface
         );
 
         return '#^' . $regex . '$#';
-    }
-
-    /**
-     * @param string $name
-     * @param string $controller
-     * @param array $config
-     * @return void
-     */
-    public function addResource(string $name, string $controller, array $config = []): void
-    {
-        (new Resource($name, $controller, $config))->build($this);
     }
 }

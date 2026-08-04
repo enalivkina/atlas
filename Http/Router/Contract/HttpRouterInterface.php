@@ -19,7 +19,7 @@ interface HttpRouterInterface
      * или неймспейс класса в формате 'Неймспейс::метод'
      * @return Route
      */
-    public function get(string $route, string|callable|array $handler): Route;
+    public function get(string $route, string|callable $handler): Route;
 
     /**
      * Добавление маршрута для метода POST
@@ -29,7 +29,7 @@ interface HttpRouterInterface
      * или неймспейс класса в формате 'Неймспейс::метод'
      * @return Route
      */
-    public function post(string $route, string|callable|array $handler): Route;
+    public function post(string $route, string|callable $handler): Route;
 
     /**
      * Добавление маршрута для метода PUT
@@ -39,7 +39,7 @@ interface HttpRouterInterface
      * или неймспейс класса в формате 'Неймспейс::метод'
      * @return Route
      */
-    public function put(string $route, string|callable|array $handler): Route;
+    public function put(string $route, string|callable $handler): Route;
 
     /**
      * Добавление маршрута для метода PATCH
@@ -49,7 +49,7 @@ interface HttpRouterInterface
      * или неймспейс класса в формате 'Неймспейс::метод'
      * @return Route
      */
-    public function patch(string $route, string|callable|array $handler): Route;
+    public function patch(string $route, string|callable $handler): Route;
 
     /**
      * Добавление маршрута для метода DELETE
@@ -59,7 +59,7 @@ interface HttpRouterInterface
      * или неймспейс класса в формате 'Неймспейс::метод'
      * @return Route
      */
-    public function delete(string $route, string|callable|array $handler): Route;
+    public function delete(string $route, string|callable $handler): Route;
 
     /**
      * Добавление группы машрутов
@@ -85,13 +85,13 @@ interface HttpRouterInterface
     /**
      * Добавление маршрута для метода запроса
      *
-     * @param  string $method метод запроса
-     * @param  string $path путь
-     * @param  string|callable $handler обработчик - коллбек функция
+     * @param string $method метод запроса
+     * @param string $route
+     * @param string|callable $handler обработчик - коллбек функция
      * или неймспейс класса в формате 'Неймспейс::метод'
      * @return Route
      */
-    public function add(string $method, string $path, string|callable $handler): Route;
+    public function add(string $method, string $route, string|callable $handler): Route;
 
     /**
      * Диспетчеризация входящего запроса
