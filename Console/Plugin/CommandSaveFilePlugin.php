@@ -17,16 +17,18 @@ final class CommandSaveFilePlugin implements ObserverInterface, ConsoleInputPlug
     private array $option;
 
     public function __construct(
+        private readonly ConsoleInputInterface $input,
         private readonly ConsoleOutputInterface $output,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
         $this->option = ['name' => 'save-file', 'hasValue' => true, 'description' => 'Сохранение вывода команды в файл'];
     }
 
-    public function init(ConsoleInputInterface $input, EventDispatcherInterface $dispatcher): void
+    public function init(): void
     {
-        $input->addDefaultOption($this->option['name'], $this->option['description']);
+        $this->input->addDefaultOption($this->option['name'], $this->option['description']);
 
-        $dispatcher->attach(ConsoleEvent::INPUT_AFTER_VALIDATE->value, $this);
+        $this->dispatcher->attach(ConsoleEvent::INPUT_AFTER_VALIDATE->value, $this);
     }
 
     public function observe(Message $event): void

@@ -8,5 +8,5 @@ use Atlas\EventDispatcher\Contract\EventDispatcherInterface;
 
 interface ConsoleInputPluginInterface
 {
-    public function init(ConsoleInputInterface $input, EventDispatcherInterface $dispatcher): void;
+    public function init(): void;
 }

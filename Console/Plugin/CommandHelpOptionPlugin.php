@@ -7,7 +7,6 @@ namespace Atlas\Console\Plugin;
 use Atlas\Console\Command\CommandDefinition;
 use Atlas\Console\Contract\ConsoleInputInterface;
 use Atlas\Console\Contract\ConsoleInputPluginInterface;
-use Atlas\Console\Contract\ConsoleKernelInterface;
 use Atlas\Console\Contract\ConsoleOutputInterface;
 use Atlas\Console\Enum\ConsoleEvent;
 use Atlas\EventDispatcher\Contract\EventDispatcherInterface;
@@ -19,17 +18,18 @@ final class CommandHelpOptionPlugin implements ConsoleInputPluginInterface, Obse
     private array $option;
 
     public function __construct(
+        private readonly ConsoleInputInterface $input,
         private readonly ConsoleOutputInterface $output,
-        private readonly ConsoleKernelInterface $kernel,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
         $this->option = ['name' => 'help', 'hasValue' => false, 'description' => 'Вывод информации о команде'];
     }
 
-    public function init(ConsoleInputInterface $input, EventDispatcherInterface $dispatcher): void
+    public function init(): void
     {
-        $input->addDefaultOption($this->option['name'], $this->option['description']);
+        $this->input->addDefaultOption($this->option['name'], $this->option['description']);
 
-        $dispatcher->attach(ConsoleEvent::INPUT_AFTER_PARSE->value, $this);
+        $this->dispatcher->attach(ConsoleEvent::INPUT_AFTER_PARSE->value, $this);
     }
 
     public function observe(Message $event): void
@@ -51,7 +51,7 @@ final class CommandHelpOptionPlugin implements ConsoleInputPluginInterface, Obse
 
         $this->printOptionsInfo($command);
 
-        $this->kernel->terminate(0);
+        exit(0);
     }
 
     /**

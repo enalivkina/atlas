@@ -17,16 +17,18 @@ final class CommandInteractiveOptionPlugin implements ConsoleInputPluginInterfac
     private array $option;
 
     public function __construct(
+        private readonly ConsoleInputInterface $input,
         private readonly ConsoleOutputInterface $output,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
         $this->option = ['name' => 'interactive', 'hasValue' => false, 'description' => 'Интерактивный ввод аргументов'];
     }
 
-    public function init(ConsoleInputInterface $input, EventDispatcherInterface $dispatcher): void
+    public function init(): void
     {
-        $input->addDefaultOption($this->option['name'], $this->option['description']);
+        $this->input->addDefaultOption($this->option['name'], $this->option['description']);
 
-        $dispatcher->attach(ConsoleEvent::INPUT_AFTER_PARSE->value, $this);
+        $this->dispatcher->attach(ConsoleEvent::INPUT_AFTER_PARSE->value, $this);
     }
 
     public function observe(Message $event): void
