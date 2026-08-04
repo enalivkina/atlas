@@ -138,11 +138,6 @@ abstract class AbstractFormRequest implements FormRequestInterface
         return $this->values;
     }
 
-    public function setValue(string $name, mixed $value): void
-    {
-        $this->values[$name] = $value;
-    }
-
     public function getFields(): array
     {
         return array_unique(array_filter(array_merge(...array_column($this->getRules(), 0)), 'is_string'));
@@ -151,5 +146,30 @@ abstract class AbstractFormRequest implements FormRequestInterface
     protected function getRules(): array
     {
         return array_merge($this->rules(), $this->dynamicRules);
+    }
+
+    public function hasErrors(): bool
+    {
+        return count($this->errors) > 0;
+    }
+
+    public function clearErrors(): void
+    {
+        $this->errors = [];
+    }
+
+    public function clearRules(): void
+    {
+        $this->dynamicRules = [];
+    }
+
+    public function has(string $name): bool
+    {
+        return array_key_exists($name, $this->values);
+    }
+
+    public function get(string $name, mixed $default = null): mixed
+    {
+        return $this->values[$name] ?? $default;
     }
 }
