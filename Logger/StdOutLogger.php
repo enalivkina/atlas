@@ -30,7 +30,7 @@ final class StdOutLogger extends AbstractLogger
         $this->initEvents();
     }
 
-    protected function formatMessage(string $level, mixed $message): string
+    protected function formatMessage(string $level, string $message): string
     {
         $data = $this->processor->process(
             message: $message,
