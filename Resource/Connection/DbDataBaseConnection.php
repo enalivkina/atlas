@@ -99,7 +99,7 @@ final class DbDataBaseConnection implements DataBaseConnectionInterface
         return $statement->rowCount();
     }
 
-    public function insert(string $resource, array $data): ?string
+    public function insert(string $resource, array $data): int
     {
         $columns = array_keys($data);
 
@@ -115,7 +115,7 @@ final class DbDataBaseConnection implements DataBaseConnectionInterface
 
         $statement->execute($bindings);
 
-        return $this->lastInsertId = $this->connection->lastInsertId();
+        return $this->lastInsertId = $this->connection->lastInsertId() ?? 0;
     }
 
     public function delete(string $resource, array $condition): int
@@ -159,20 +159,5 @@ final class DbDataBaseConnection implements DataBaseConnectionInterface
         $statement->execute($statementParams->bindings);
 
         return $statement;
-    }
-
-    public function beginTransaction(): void
-    {
-        $this->connection->beginTransaction();
-    }
-
-    public function commit(): void
-    {
-        $this->connection->commit();
-    }
-
-    public function rollBack(): void
-    {
-        $this->connection->rollBack();
     }
 }

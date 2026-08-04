@@ -23,10 +23,4 @@ interface DataBaseConnectionInterface
     public function delete(string $resource, array $condition): int;
 
     public function getLastInsertId(): string;
-
-    public function beginTransaction(): void;
-
-    public function commit(): void;
-
-    public function rollBack(): void;
 }

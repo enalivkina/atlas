@@ -3,27 +3,28 @@
 namespace Atlas\Resource\Connection;
 
 use Atlas\Resource\Connection\Contract\DataBaseConnectionInterface;
+use Atlas\Resource\Exception\FileNotExistsException;
+use Atlas\Resource\Exception\InvalidQueryException;
+use Atlas\Resource\Query\File\StatementParameter;
+use Atlas\Resource\Query\Operator;
+use Atlas\Resource\Query\QueryBuilderInterface;
 
 final class FileDataBaseConnection implements DataBaseConnectionInterface
 {
     private ?string $lastInsertId = null;
     private array $operators;
 
-    public function __construct(
-        private readonly AliasManager $aliasManager,
-        string $resourcesPath = '@app/runtime',
-    ) {
-        $this->aliasManager->addAlias('@file-resources', $resourcesPath);
+    public function __construct(array $config) {
         $this->operators = [
-            OperatorsEnum::EQ->value => fn(string $item, string $compare): bool => $item === $compare,
-            OperatorsEnum::NE->value => fn(string $item, string $compare): bool => $item !== $compare,
-            OperatorsEnum::GT->value => fn(string $item, string $compare): bool => $item > $compare,
-            OperatorsEnum::GTE->value => fn(string $item, string $compare): bool => $item >= $compare,
-            OperatorsEnum::LT->value => fn(string $item, string $compare): bool => $item < $compare,
-            OperatorsEnum::LTE->value => fn(string $item, string $compare): bool => $item <= $compare,
-            OperatorsEnum::IN->value => fn(string $item, array $compare): bool => in_array($item, $compare) === true,
-            OperatorsEnum::NIN->value => fn(string $item, array $compare): bool => in_array($item, $compare) === false,
-            OperatorsEnum::LIKE->value => fn(string $item, string $compare): bool => str_contains($item, $compare) === true,
+            Operator::EQ->value => fn(string $item, string $compare): bool => $item === $compare,
+            Operator::NE->value => fn(string $item, string $compare): bool => $item !== $compare,
+            Operator::GT->value => fn(string $item, string $compare): bool => $item > $compare,
+            Operator::GTE->value => fn(string $item, string $compare): bool => $item >= $compare,
+            Operator::LT->value => fn(string $item, string $compare): bool => $item < $compare,
+            Operator::LTE->value => fn(string $item, string $compare): bool => $item <= $compare,
+            Operator::IN->value => fn(string $item, array $compare): bool => in_array($item, $compare) === true,
+            Operator::NIN->value => fn(string $item, array $compare): bool => in_array($item, $compare) === false,
+            Operator::LIKE->value => fn(string $item, string $compare): bool => str_contains($item, $compare) === true,
         ];
     }
 
@@ -112,7 +113,7 @@ final class FileDataBaseConnection implements DataBaseConnectionInterface
      * @throws \JsonException
      * @throws InvalidQueryException
      */
-    public function insert(string $resource, array $data): ?string
+    public function insert(string $resource, array $data): int
     {
         $filepath = $this->getFilepath($resource);
         $existingData = $this->readArrayFromJasonFile($filepath);
@@ -167,12 +168,12 @@ final class FileDataBaseConnection implements DataBaseConnectionInterface
         return $this->lastInsertId ?? '';
     }
 
-    private function getStatement(FileQueryBuilderInterface $queryBuilder): StatementParameters
+    private function getStatement(QueryBuilderInterface $queryBuilder): StatementParameter
     {
         return $queryBuilder->getStatement();
     }
 
-    private function applyQueryParameters(array $data, StatementParameters $statement): array
+    private function applyQueryParameters(array $data, StatementParameter $statement): array
     {
         if (empty($statement->whereClause) === false) {
             $data = array_filter($data, fn(array $item): bool => $this->matchCondition($item, $statement->whereClause));
@@ -253,10 +254,8 @@ final class FileDataBaseConnection implements DataBaseConnectionInterface
     /**
      * @throws FileNotExistsException
      */
-    private function getFilepath(string $resource): string
+    private function getFilepath(string $filepath): string
     {
-        $filepath = $this->aliasManager->buildPath('@file-resources/' . $resource . '.json');
-
         if (file_exists($filepath) === false) {
             throw new FileNotExistsException("Файл $filepath не существует");
         }
@@ -267,10 +266,8 @@ final class FileDataBaseConnection implements DataBaseConnectionInterface
     /**
      * @throws \JsonException
      */
-    private function saveLastId(string $resource, int $id): void
+    private function saveLastId(string $filepathMeta, int $id): void
     {
-        $filepathMeta = $this->aliasManager->buildPath('@file-resources/_meta.json');
-
         if (file_exists($filepathMeta) === false) {
             $dir = dirname($filepathMeta);
 
@@ -283,7 +280,7 @@ final class FileDataBaseConnection implements DataBaseConnectionInterface
         }
 
         $existingData = $this->readArrayFromJasonFile($filepathMeta);
-        $existingData[$resource] = $id;
+        $existingData[$filepathMeta] = $id;
 
         $this->writeArrayToJasonFile($filepathMeta, $existingData);
         chmod($filepathMeta, 0644);
@@ -292,10 +289,8 @@ final class FileDataBaseConnection implements DataBaseConnectionInterface
     /**
      * @throws \JsonException
      */
-    private function loadLastId(string $resource): int
+    private function loadLastId(string $filepathMeta): int
     {
-        $filepathMeta = $this->aliasManager->buildPath('@file-resources/_meta.json');
-
         if (file_exists($filepathMeta) === false) {
             $this->saveLastId($resource, 0);
         }
@@ -318,20 +313,5 @@ final class FileDataBaseConnection implements DataBaseConnectionInterface
     private function readArrayFromJasonFile(string $filepath): array
     {
         return json_decode(file_get_contents($filepath), true, flags: JSON_THROW_ON_ERROR);
-    }
-
-    public function beginTransaction(): void
-    {
-        throw new BadMethodCallException('Не реализуется для файлов');
-    }
-
-    public function commit(): void
-    {
-        throw new BadMethodCallException('Не реализуется для файлов');
-    }
-
-    public function rollBack(): void
-    {
-        throw new BadMethodCallException('Не реализуется для файлов');
     }
 }
