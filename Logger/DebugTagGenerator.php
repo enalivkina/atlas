@@ -4,21 +4,24 @@ declare(strict_types=1);
 
 namespace Atlas\Logger;
 
+use Atlas\Logger\Contract\DebugTagStorageInterface;
+
 final class DebugTagGenerator
 {
-    private string $tag;
-    public function __construct(private readonly bool $isUpdatable = false)
+    public function __construct(
+        private readonly DebugTagStorageInterface $tagStorage,
+        private readonly string $indexName,
+        private readonly string $mode = 'web',
+    ) { }
+
+    public function init(): void
     {
-        $this->tag = $this->generateTag();
+        $this->tagStorage->setTag($this->generateTag());
     }
 
-    public function updateTag(): void
+    public function refreshTag(): void
     {
-        if ($this->isUpdatable === false) {
-            throw new \RuntimeException('Обновление тега запрещено');
-        }
-
-        $this->tag = $this->generateTag();
+        $this->init();
     }
 
     private function generateTag(): string
@@ -29,10 +32,5 @@ final class DebugTagGenerator
             getmypid(),
             random_int(0, 0xFFFF),
         ));
-    }
-
-    public function getTag(): string
-    {
-        return $this->tag;
     }
 }
