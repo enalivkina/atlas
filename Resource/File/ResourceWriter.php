@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Atlas\Resource\File;
 
+use Atlas\Resource\Connection\Contract\DataBaseConnectionInterface;
 use Atlas\Resource\Contract\ResourceWriterInterface;
 use InvalidArgumentException;
 
@@ -14,7 +15,7 @@ final class ResourceWriter implements ResourceWriterInterface
     private ?array $accessibleFields = null;
 
     public function __construct(
-        private readonly DataBaseConnectionInterface $databaseConnection,
+        private readonly DataBaseConnectionInterface $connection,
     ) {}
 
     public function setResourceName(string $name): static
@@ -31,11 +32,11 @@ final class ResourceWriter implements ResourceWriterInterface
         return $this;
     }
 
-    public function create(array $values): ?string
+    public function create(array $values): int
     {
         $this->validateSelfState();
 
-        return $this->databaseConnection->insert($this->resourceName, $values);
+        return $this->connection->insert($this->resourceName, $values);
     }
 
     public function update(int|string $id, array $values): int
@@ -49,7 +50,7 @@ final class ResourceWriter implements ResourceWriterInterface
             $values[$fieldName] = $values[$fieldName] ?? null;
         }
 
-        return $this->databaseConnection->update(
+        return $this->connection->update(
             $this->resourceName,
             $values,
             ['id' => $id],
@@ -64,7 +65,7 @@ final class ResourceWriter implements ResourceWriterInterface
 
         $values['id'] = (int) $id;
 
-        return $this->databaseConnection->update(
+        return $this->connection->update(
             $this->resourceName,
             $values,
             ['id' => $id],
@@ -75,7 +76,7 @@ final class ResourceWriter implements ResourceWriterInterface
     {
         $this->validateSelfState();
 
-        return $this->databaseConnection->delete(
+        return $this->connection->delete(
             $this->resourceName,
             ['id' => $id],
         );

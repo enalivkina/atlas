@@ -2,9 +2,9 @@
 
 namespace Atlas\Resource\Connection;
 
-use Atlas\Resource\Connection\Contract\ConnectionInterface;
+use Atlas\Resource\Connection\Contract\DataBaseConnectionInterface;
 
-final class FileConnection implements ConnectionInterface
+final class FileDataBaseConnection implements DataBaseConnectionInterface
 {
     private ?string $lastInsertId = null;
     private array $operators;

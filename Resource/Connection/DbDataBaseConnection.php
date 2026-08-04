@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Atlas\Resource\Connection;
 
-use Atlas\Resource\Connection\Contract\ConnectionInterface;
+use Atlas\Resource\Connection\Contract\DataBaseConnectionInterface;
 use PDO;
 use PDOStatement;
 use Atlas\Resource\Query\QueryBuilderInterface;
 
-final class DbConnection implements ConnectionInterface
+final class DbDataBaseConnection implements DataBaseConnectionInterface
 {
     private PDO $connection;
     private string $lastInsertId = '';
