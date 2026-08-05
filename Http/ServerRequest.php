@@ -43,14 +43,14 @@ final class ServerRequest extends Message implements ServerRequestInterface
             }
         }
 
-        $uri = new Uri((string)($_SERVER['REQUEST_URI'] ?? '/'));
+        $uri = new Uri((string) ($_SERVER['REQUEST_URI'] ?? '/'));
         $body = new Stream(fopen('php://input', 'rb'));
         $headers = [];
 
         foreach ($_SERVER as $key => $value) {
             if (str_starts_with($key, 'HTTP_') === true) {
                 $name = str_replace('_', '-', substr($key, 5));
-                $headerValues = array_map(fn ($x) => trim(explode(';', $x)[0]), explode(',', $value));
+                $headerValues = array_map(fn($x) => trim(explode(';', $x)[0]), explode(',', $value));
 
                 $headers[$name] = $headerValues;
             }
@@ -62,7 +62,7 @@ final class ServerRequest extends Message implements ServerRequestInterface
             headers: $headers,
             protocolVersion: $_SERVER['SERVER_PROTOCOL'] ?? '1.1',
             method: $method,
-            serverParams: $_SERVER
+            serverParams: $_SERVER,
         );
 
         return $request
@@ -79,8 +79,7 @@ final class ServerRequest extends Message implements ServerRequestInterface
         string $protocolVersion = '1.1',
         private string $method = 'GET',
         private readonly array $serverParams = [],
-    )
-    {
+    ) {
         parent::__construct(
             body: $body,
             headers: $headers,

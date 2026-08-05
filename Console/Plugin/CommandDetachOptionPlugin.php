@@ -20,8 +20,7 @@ final class CommandDetachOptionPlugin implements ConsoleInputPluginInterface, Ob
         private readonly ConsoleInputInterface $input,
         private readonly ConsoleOutputInterface $output,
         private readonly EventDispatcherInterface $dispatcher,
-    )
-    {
+    ) {
         $this->option = [
             'name' => 'detach',
             'hasValue' => false,

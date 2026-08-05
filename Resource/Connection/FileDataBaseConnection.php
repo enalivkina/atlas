@@ -14,7 +14,8 @@ final class FileDataBaseConnection implements DataBaseConnectionInterface
     private ?string $lastInsertId = null;
     private array $operators;
 
-    public function __construct(array $config) {
+    public function __construct(array $config)
+    {
         $this->operators = [
             Operator::EQ->value => fn(string $item, string $compare): bool => $item === $compare,
             Operator::NE->value => fn(string $item, string $compare): bool => $item !== $compare,

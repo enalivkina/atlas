@@ -52,7 +52,7 @@ final class HttpKernel implements HttpKernelInterface
 
             $isContentTypeAccepted = $this->isContentTypeAccepted(
                 $responseContentType,
-                $request->getHeader('Accept')
+                $request->getHeader('Accept'),
             );
 
             if ($isContentTypeAccepted === false) {
@@ -63,7 +63,7 @@ final class HttpKernel implements HttpKernelInterface
                 ->withStatus($statusCode)
                 ->withHeader('Content-Type', $responseContentType);
 
-            $response->getBody()->write((string)$message);
+            $response->getBody()->write((string) $message);
         } catch (HttpException $e) {
             $this->logger->error($e->getMessage());
 
@@ -72,7 +72,7 @@ final class HttpKernel implements HttpKernelInterface
             $response = $this->response
                 ->withStatus(
                     $e->getStatusCode(),
-                    $e->getMessage()
+                    $e->getMessage(),
                 );
 
             if ($response->hasHeader('Content-Type') === false) {
@@ -88,7 +88,7 @@ final class HttpKernel implements HttpKernelInterface
             $response = $this->response
                 ->withStatus(
                     StatusCode::STATUS_INTERNAL_SERVER_ERROR->value,
-                    $e->getMessage()
+                    $e->getMessage(),
                 );
 
             if ($response->hasHeader('Content-Type') === false) {
@@ -118,7 +118,7 @@ final class HttpKernel implements HttpKernelInterface
         foreach ($acceptTypes as $acceptType) {
             $acceptTypeBase = trim(explode(';', $acceptType)[0]);
             $regex = '/^' . str_replace('\*', '.*', preg_quote($acceptTypeBase, '/')) . '$/';
-            
+
             if (preg_match($regex, $contentTypeBase) === 1) {
                 return true;
             }

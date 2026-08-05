@@ -26,7 +26,7 @@ final class HttpErrorHandler implements ErrorHandlerInterface
         private readonly DebugTagStorageInterface $debugTagStorage,
         private readonly ContainerInterface $container,
         private string $mode = ContentType::HTML->value,
-    ) { }
+    ) {}
 
     /**
      * @throws ViewNotFoundException

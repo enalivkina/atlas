@@ -126,7 +126,7 @@ final class Router implements HttpRouterInterface, MiddlewareAssignable
                 $pathParams = array_filter(
                     $matches,
                     fn($key) => is_int($key) === false,
-                    ARRAY_FILTER_USE_KEY
+                    ARRAY_FILTER_USE_KEY,
                 );
                 $pathParams = array_map('urldecode', $pathParams);
 
@@ -156,11 +156,11 @@ final class Router implements HttpRouterInterface, MiddlewareAssignable
             },
             function (
                 ServerRequestInterface $request,
-                ServerResponseInterface $response
+                ServerResponseInterface $response,
             ) {
-                $this->container->registerSingleton(fn () => $request, ServerRequestInterface::class, );
-                $this->container->registerSingleton(fn () => $response, ServerResponseInterface::class);
-            }
+                $this->container->registerSingleton(fn() => $request, ServerRequestInterface::class, );
+                $this->container->registerSingleton(fn() => $response, ServerResponseInterface::class);
+            },
         );
 
         $this->container->call($middlewareChain, '__invoke', ['request' => $request]);
@@ -292,7 +292,7 @@ final class Router implements HttpRouterInterface, MiddlewareAssignable
             return $value;
         } catch (ValidationException $e) {
             throw new HttpBadRequestException(
-                "Ошибка валидации параметра '{$name}': " . $e->getMessage()
+                "Ошибка валидации параметра '{$name}': " . $e->getMessage(),
             );
         }
     }
@@ -335,7 +335,7 @@ final class Router implements HttpRouterInterface, MiddlewareAssignable
 
                 return "(?P<{$name}>[^/]+)";
             },
-            explode('?', $routeTemplate, 2)[0]
+            explode('?', $routeTemplate, 2)[0],
         );
 
         return '#^' . $regex . '$#';

@@ -14,8 +14,7 @@ final class ClosureObserver implements ObserverInterface
      */
     public function __construct(
         private readonly Closure $listener,
-    ) {
-    }
+    ) {}
 
     public function observe(Message $event): void
     {

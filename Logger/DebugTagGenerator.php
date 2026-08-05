@@ -12,7 +12,7 @@ final class DebugTagGenerator
         private readonly DebugTagStorageInterface $tagStorage,
         private readonly string $indexName,
         private readonly string $mode = 'web',
-    ) { }
+    ) {}
 
     public function init(): void
     {

@@ -15,7 +15,7 @@ final class AnsiConsoleOutput implements ConsoleOutputInterface
         private readonly ContainerInterface $container,
         private $stdOut = STDOUT,
         private $stdErr = STDERR,
-    ) { }
+    ) {}
 
     /**
      * Создать строку вывода в формате ANSI
