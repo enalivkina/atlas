@@ -11,9 +11,11 @@ final class Route implements MiddlewareAssignable
     public function __construct(
         public string $method,
         public string $path,
+        public string $regex,
+        public array $handler,
+        public array $middlewares = [],
         public array $params = [],
-        private string|\Closure $handler,
-        private array $middlewares = [],
+        public array $groupStack = [],
     ) {}
 
     public function addMiddleware(callable|string $middleware): MiddlewareAssignable
@@ -21,15 +23,5 @@ final class Route implements MiddlewareAssignable
         $this->middlewares[] = $middleware;
 
         return $this;
-    }
-
-    public function getMiddlewares(): array
-    {
-        return $this->middlewares;
-    }
-
-    public function getHandler(): callable|string
-    {
-        return $this->handler;
     }
 }

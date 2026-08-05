@@ -14,7 +14,6 @@ use Atlas\Http\Exceptions\HttpNotAcceptableException;
 use Atlas\Http\Router\Contract\HttpRouterInterface;
 use Atlas\Logger\Contract\LoggerInterface;
 use Atlas\Http\Contract\ServerResponseInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -23,7 +22,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final class HttpKernel implements HttpKernelInterface
 {
     public function __construct(
-        private readonly ResponseInterface $response,
+        private readonly ServerResponseInterface $response,
         private readonly HttpRouterInterface $router,
         private readonly LoggerInterface $logger,
         private readonly ErrorHandlerInterface $errorHandler,
@@ -98,21 +97,9 @@ final class HttpKernel implements HttpKernelInterface
 
             $response->getBody()->write($body);
         } finally {
-            $this->logger->error($e->getMessage());
-
-            $body = $this->errorHandler->handle($e);
-
-            $response = $this->response
-                ->withStatus(
-                    StatusCode::STATUS_INTERNAL_SERVER_ERROR->value,
-                    $e->getMessage()
-                );
-
             if ($response->hasHeader('Content-Type') === false) {
                 $response = $response->withHeader('Content-Type', 'text/html; charset=utf-8');
             }
-
-            $response->getBody()->write($body);
         }
 
         return $response;

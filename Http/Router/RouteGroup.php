@@ -35,4 +35,9 @@ final class RouteGroup implements MiddlewareAssignable
     {
         return $this->name;
     }
+
+    public function getMiddlewares(): array
+    {
+        return $this->middlewares;
+    }
 }
