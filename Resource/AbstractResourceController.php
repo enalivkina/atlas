@@ -212,7 +212,7 @@ abstract class AbstractResourceController
             'values' => $form->getValues(),
         ]));
 
-        return new CreateResponse($createdId);
+        return new CreateResponse((string) $createdId);
     }
 
     /**

@@ -6,7 +6,7 @@ namespace Atlas\Http\Router;
 
 use Atlas\Http\Router\Contract\HttpRouterInterface;
 
-class Resource
+final class Resource
 {
     /**
      * @param string $name
