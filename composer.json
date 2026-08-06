@@ -1,5 +1,5 @@
 {
-  "name": "atlas/atlas",
+  "name": "enalivkina/atlas",
   "autoload": {
     "psr-4": {
       "Atlas\\": ""
