@@ -1,5 +1,5 @@
 {
-  "name": "enalivkina/atlas",
+  "name": "framework-education/atlas",
   "autoload": {
     "psr-4": {
       "Atlas\\": ""
