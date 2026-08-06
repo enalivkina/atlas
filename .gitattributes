@@ -3,3 +3,4 @@
 /codeception.yml
 .gitignore
 /*.dist
+Makefile export-ignore
