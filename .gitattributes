@@ -3,4 +3,11 @@
 /codeception.yml
 .gitignore
 /*.dist
+/tests export-ignore
+/codeception.yml export-ignore
+.gitignore export-ignore
+/*.dist export-ignore
+docker-compose.yml export-ignore
+/.docker export-ignore
+/.csFixer export-ignore
 Makefile export-ignore
