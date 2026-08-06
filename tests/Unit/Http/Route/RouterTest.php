@@ -28,7 +28,7 @@ final class RouterTest extends TestCase
     {
         $route = $this->router->get(
             '/users',
-            [TestController::class, 'index']
+            [TestController::class, 'index'],
         );
 
         self::assertInstanceOf(Route::class, $route);
@@ -37,7 +37,7 @@ final class RouterTest extends TestCase
         self::assertSame('/users', $route->path);
 
         self::assertTrue(
-            $this->router->has('GET', '/users')
+            $this->router->has('GET', '/users'),
         );
     }
 
@@ -45,11 +45,11 @@ final class RouterTest extends TestCase
     {
         $this->router->post(
             '/users',
-            [TestController::class, 'store']
+            [TestController::class, 'store'],
         );
 
         self::assertTrue(
-            $this->router->has('POST', '/users')
+            $this->router->has('POST', '/users'),
         );
     }
 
@@ -57,11 +57,11 @@ final class RouterTest extends TestCase
     {
         $this->router->put(
             '/users',
-            [TestController::class, 'update']
+            [TestController::class, 'update'],
         );
 
         self::assertTrue(
-            $this->router->has('PUT', '/users')
+            $this->router->has('PUT', '/users'),
         );
     }
 
@@ -69,11 +69,11 @@ final class RouterTest extends TestCase
     {
         $this->router->patch(
             '/users',
-            [TestController::class, 'patch']
+            [TestController::class, 'patch'],
         );
 
         self::assertTrue(
-            $this->router->has('PATCH', '/users')
+            $this->router->has('PATCH', '/users'),
         );
     }
 
@@ -81,18 +81,18 @@ final class RouterTest extends TestCase
     {
         $this->router->delete(
             '/users',
-            [TestController::class, 'delete']
+            [TestController::class, 'delete'],
         );
 
         self::assertTrue(
-            $this->router->has('DELETE', '/users')
+            $this->router->has('DELETE', '/users'),
         );
     }
 
     public function testHasReturnsFalseForUnknownRoute(): void
     {
         self::assertFalse(
-            $this->router->has('GET', '/unknown')
+            $this->router->has('GET', '/unknown'),
         );
     }
 
@@ -100,11 +100,11 @@ final class RouterTest extends TestCase
     {
         $this->router->get(
             '/users',
-            [TestController::class, 'index']
+            [TestController::class, 'index'],
         );
 
         self::assertTrue(
-            $this->router->has('get', '/users')
+            $this->router->has('get', '/users'),
         );
     }
 
@@ -112,15 +112,15 @@ final class RouterTest extends TestCase
     {
         $this->router->get(
             '/users/{:id}',
-            [TestController::class, 'show']
+            [TestController::class, 'show'],
         );
 
         self::assertTrue(
-            $this->router->has('GET', '/users/15')
+            $this->router->has('GET', '/users/15'),
         );
 
         self::assertTrue(
-            $this->router->has('GET', '/users/999')
+            $this->router->has('GET', '/users/999'),
         );
     }
 
@@ -128,12 +128,12 @@ final class RouterTest extends TestCase
     {
         $route = $this->router->get(
             '/users/{:id}',
-            [TestController::class, 'show']
+            [TestController::class, 'show'],
         );
 
         self::assertMatchesRegularExpression(
             $route->regex,
-            '/users/42'
+            '/users/42',
         );
     }
 
@@ -141,7 +141,7 @@ final class RouterTest extends TestCase
     {
         $route = $this->router->get(
             '/users/{:id|int}',
-            [TestController::class, 'show']
+            [TestController::class, 'show'],
         );
 
         self::assertSame(
@@ -153,7 +153,7 @@ final class RouterTest extends TestCase
                     'default' => null,
                 ],
             ],
-            $route->params
+            $route->params,
         );
     }
 
@@ -161,7 +161,7 @@ final class RouterTest extends TestCase
     {
         $route = $this->router->get(
             '/users/{?:page|int=1}',
-            [TestController::class, 'show']
+            [TestController::class, 'show'],
         );
 
         self::assertSame(
@@ -173,7 +173,7 @@ final class RouterTest extends TestCase
                     'default' => '1',
                 ],
             ],
-            $route->params
+            $route->params,
         );
     }
 
@@ -183,12 +183,12 @@ final class RouterTest extends TestCase
 
         $route = $this->router->get(
             '/users',
-            [TestController::class, 'index']
+            [TestController::class, 'index'],
         );
 
         self::assertSame(
             [AuthMiddleware::class],
-            $route->middlewares
+            $route->middlewares,
         );
     }
 
@@ -199,16 +199,16 @@ final class RouterTest extends TestCase
             function (Router $router): void {
                 $router->get(
                     '/users',
-                    [TestController::class, 'index']
+                    [TestController::class, 'index'],
                 );
-            }
+            },
         );
 
         self::assertTrue(
             $this->router->has(
                 'GET',
-                '/api/users'
-            )
+                '/api/users',
+            ),
         );
     }
 
@@ -224,18 +224,18 @@ final class RouterTest extends TestCase
 
                         $router->get(
                             '/users',
-                            [TestController::class, 'index']
+                            [TestController::class, 'index'],
                         );
-                    }
+                    },
                 );
-            }
+            },
         );
 
         self::assertTrue(
             $this->router->has(
                 'GET',
-                '/api/v1/users'
-            )
+                '/api/v1/users',
+            ),
         );
     }
 }

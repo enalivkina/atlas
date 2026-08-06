@@ -25,7 +25,7 @@ final class RouteTest extends TestCase
 
         self::assertSame(
             [UserController::class, 'show'],
-            $route->handler
+            $route->handler,
         );
 
         self::assertSame([], $route->middlewares);
@@ -53,17 +53,17 @@ final class RouteTest extends TestCase
 
         self::assertSame(
             [AuthMiddleware::class],
-            $route->middlewares
+            $route->middlewares,
         );
 
         self::assertSame(
             ['id' => 15],
-            $route->params
+            $route->params,
         );
 
         self::assertSame(
             ['/api'],
-            $route->groupStack
+            $route->groupStack,
         );
     }
 
@@ -84,7 +84,7 @@ final class RouteTest extends TestCase
 
         self::assertSame(
             AuthMiddleware::class,
-            $route->middlewares[0]
+            $route->middlewares[0],
         );
     }
 
@@ -106,7 +106,7 @@ final class RouteTest extends TestCase
                 AuthMiddleware::class,
                 LogMiddleware::class,
             ],
-            $route->middlewares
+            $route->middlewares,
         );
     }
 
@@ -119,13 +119,13 @@ final class RouteTest extends TestCase
             handler: [UserController::class, 'index'],
         );
 
-        $middleware = static fn () => true;
+        $middleware = static fn() => true;
 
         $route->addMiddleware($middleware);
 
         self::assertSame(
             $middleware,
-            $route->middlewares[0]
+            $route->middlewares[0],
         );
     }
 }

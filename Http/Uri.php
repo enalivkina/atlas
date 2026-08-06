@@ -25,7 +25,7 @@ final class Uri implements UriInterface
             }
             $this->scheme = $parts['scheme'] ?? '';
             $this->userInfo = isset($parts['user']) === true ? $parts['user'] : '';
-            if (isset($parts['pass']) === true){
+            if (isset($parts['pass']) === true) {
                 $this->userInfo .= ':' . $parts['pass'];
             }
             $this->host = $parts['host'] ?? '';
@@ -140,7 +140,7 @@ final class Uri implements UriInterface
         $instance = clone $this;
         $instance->userInfo = $user;
 
-        if ($password !== null){
+        if ($password !== null) {
             $instance->userInfo .= ':' . $password;
         }
 

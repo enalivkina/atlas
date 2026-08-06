@@ -7,13 +7,13 @@ namespace Atlas\Http\ErrorHandler\Strategy;
 use Atlas\Container\ContainerInterface;
 use Atlas\Http\Contract\ServerResponseInterface;
 use Atlas\Http\Exceptions\HttpException;
-use Atlas\Logger\DebugTagStorage;
+use Atlas\Logger\Contract\DebugTagStorageInterface;
 use Throwable;
 
 final readonly class JsonRenderingStrategy implements RenderingStrategyInterface
 {
     public function __construct(
-        private DebugTagStorage $debugTagStorage,
+        private DebugTagStorageInterface $debugTagStorage,
         private ContainerInterface $container,
     ) {}
 

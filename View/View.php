@@ -4,27 +4,29 @@ declare(strict_types=1);
 
 namespace Atlas\View;
 
-use Atlas\Common\AliasManager;
-
 final class View implements ViewInterface
 {
     public function __construct(
-        private readonly AliasManager $aliasManager,
-        string $rootPath,
+        private string $basePath = '...',
     ) {
-        $this->aliasManager->addAlias('@view', $rootPath);
+        $this->setBasePath($basePath);
+    }
+
+    public function setBasePath(string $path): void
+    {
+        $this->basePath = rtrim($this->basePath, '/\\');
+
+        if (is_dir($this->basePath) === false) {
+            throw new \RuntimeException("Каталог представлений не найден: {$this->basePath}");
+        }
     }
 
     public function render(string $view, array $params = []): string
     {
-        if ($this->aliasManager->hasAlias($view) === false) {
-            $view = '@view/' . $view;
-        }
+        $path = $this->basePath . '/' . ltrim($view, '/\\') . '.php';
 
-        $filePath = $this->aliasManager->buildPath($view) . '.php';
-
-        if (file_exists($filePath) === false) {
-            throw new ViewNotFoundException($filePath);
+        if (file_exists($path) === false) {
+            throw new ViewNotFoundException($view);
         }
 
         extract($params);

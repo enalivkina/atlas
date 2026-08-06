@@ -12,7 +12,11 @@ use Atlas\Console\Enum\Color;
 
 final class ListCommand implements ConsoleCommandInterface
 {
-    public function __construct(private readonly ConsoleKernelInterface $kernel) {}
+    public function __construct(
+        private readonly ConsoleInputInterface $input,
+        private readonly ConsoleOutputInterface $output,
+        private readonly ConsoleKernelInterface $kernel,
+    ) {}
 
     public static function getSignature(): string
     {
@@ -24,45 +28,50 @@ final class ListCommand implements ConsoleCommandInterface
         return 'Команда вывода информации о консольном ядре';
     }
 
-    public function execute(ConsoleInputInterface $input, ConsoleOutputInterface $output): void
+    public function execute(): void
     {
-        $output->info($this->kernel->getAppName());
-        $output->info(' ' . $this->kernel->getVersion());
-        $output->writeLn(2);
-        $output->warning("Фреймворк создан {$this->kernel->getAppName()}.\nЯвляется платформой для изучения базового поведения приложения созданного на PHP.\nФреймворк не является production-ready реализацией и не предназначен для коммерческого использования.");
-        $output->writeLn(2);
+        $this->output->info($this->kernel->getAppName());
+        $this->output->info(' ' . $this->kernel->getVersion());
+        $this->output->writeLn(2);
+        $this->output->warning("Фреймворк создан {$this->kernel->getAppName()}.\nЯвляется платформой для изучения базового поведения приложения созданного на PHP.\nФреймворк не является production-ready реализацией и не предназначен для коммерческого использования.");
+        $this->output->writeLn(2);
 
-        $output->success('Доступные опции:');
+        $this->output->success('Доступные опции:');
 
-        foreach ($input->getDefaultOptions() as $defaultOption) {
-            $output->writeLn();
-            $output->success('  --' . $defaultOption->name);
+        foreach ($this->input->getDefaultOptions() as $defaultOption) {
+            $this->output->writeLn();
+            $this->output->success('  --' . $defaultOption->name);
 
             if (is_null($defaultOption->description) === false) {
-                $output->stdout(' - ' . $defaultOption->description);
+                $this->output->stdout(' - ' . $defaultOption->description);
             }
         }
 
-        $output->writeLn(2);
+        $this->output->writeLn(2);
 
-        $output->success('Вызов:');
-        $output->writeLn();
-        $output->stdout('  команда [аргументы] [опции]');
-        $output->writeLn(2);
+        $this->output->success('Вызов:');
+        $this->output->writeLn();
+        $this->output->stdout('  команда [аргументы] [опции]');
+        $this->output->writeLn(2);
 
-        $output->stdout('Доступные команды:');
+        $this->output->stdout('Доступные команды:');
 
         foreach ($this->kernel->getCommands() as $commandsNamespace => $commands) {
-            $output->writeLn();
-            $output->stdout("  Неймспейс $commandsNamespace:", [Color::FG_GREEN->value]);
+            $this->output->writeLn();
+            $this->output->stdout("  Неймспейс $commandsNamespace:", [Color::FG_GREEN->value]);
 
             foreach ($commands as $commandName => $command) {
-                $output->writeLn();
-                $output->success('    ' . $commandName);
-                $output->stdout(' - ' . $command::getDescription());
+                $this->output->writeLn();
+                $this->output->success('    ' . $commandName);
+                $this->output->stdout(' - ' . $command::getDescription());
             }
         }
 
-        $output->writeLn(2);
+        $this->output->writeLn(2);
+    }
+
+    public function isHidden(): bool
+    {
+        return false;
     }
 }

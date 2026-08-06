@@ -6,7 +6,7 @@ namespace Atlas\Http\Router;
 
 use Atlas\Http\Router\Contract\HttpRouterInterface;
 
-class Resource
+final class Resource
 {
     /**
      * @param string $name
@@ -16,7 +16,7 @@ class Resource
     public function __construct(
         private readonly string $name,
         private readonly string $controller,
-        private array           $config = []
+        private array           $config = [],
     ) {}
 
     /**
@@ -40,7 +40,7 @@ class Resource
             $route = $router->add(
                 $params['method'],
                 $fullPath,
-                $this->controller . '::' . $params['action']
+                $this->controller . '::' . $params['action'],
             );
 
             if (empty($params['middleware']) === false) {
@@ -103,7 +103,7 @@ class Resource
             if (isset($overrides['middleware']) === true) {
                 $config[$method]['middleware'] = array_merge(
                     $config[$method]['middleware'],
-                    (array)$overrides['middleware']
+                    (array) $overrides['middleware'],
                 );
             }
         }

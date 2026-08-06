@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Atlas\Http;
 
 use Atlas\Common\Contract\ErrorHandlerInterface;
-use Atlas\Common\Contract\ModuleInterface;
 use Atlas\Container\ContainerInterface;
+use Atlas\EventDispatcher\Contract\EventDispatcherInterface;
 use Atlas\Http\Contract\HTTPKernelInterface;
 use Atlas\Http\Enum\StatusCode;
 use Atlas\Http\Exceptions\HttpException;
@@ -22,14 +22,13 @@ use Psr\Http\Message\ServerRequestInterface;
 final class HttpKernel implements HttpKernelInterface
 {
     public function __construct(
+        private readonly ServerResponseInterface $response,
         private readonly HttpRouterInterface $router,
         private readonly LoggerInterface $logger,
         private readonly ErrorHandlerInterface $errorHandler,
+        private readonly EventDispatcherInterface $eventDispatcher,
         private readonly ContainerInterface $container,
-        array $modules = [],
-    ) {
-        $this->initModules($modules);
-    }
+    ) {}
 
     public function handle(ServerRequestInterface $request): ServerResponseInterface
     {
@@ -53,27 +52,27 @@ final class HttpKernel implements HttpKernelInterface
 
             $isContentTypeAccepted = $this->isContentTypeAccepted(
                 $responseContentType,
-                $request->getHeader('Accept')
+                $request->getHeader('Accept'),
             );
 
             if ($isContentTypeAccepted === false) {
                 throw new HttpNotAcceptableException();
             }
 
-            $response = $this->container->get(ServerResponseInterface::class)
+            $response = $this->response
                 ->withStatus($statusCode)
                 ->withHeader('Content-Type', $responseContentType);
 
-            $response->getBody()->write((string)$message);
+            $response->getBody()->write((string) $message);
         } catch (HttpException $e) {
-            $this->logger->error($e);
+            $this->logger->error($e->getMessage());
 
             $body = $this->errorHandler->handle($e);
 
-            $response = $this->container->get(ServerResponseInterface::class)
+            $response = $this->response
                 ->withStatus(
                     $e->getStatusCode(),
-                    $e->getMessage()
+                    $e->getMessage(),
                 );
 
             if ($response->hasHeader('Content-Type') === false) {
@@ -82,14 +81,14 @@ final class HttpKernel implements HttpKernelInterface
 
             $response->getBody()->write($body);
         } catch (\Throwable $e) {
-            $this->logger->error($e);
+            $this->logger->error($e->getMessage());
 
             $body = $this->errorHandler->handle($e);
 
-            $response = $this->container->get(ServerResponseInterface::class)
+            $response = $this->response
                 ->withStatus(
                     StatusCode::STATUS_INTERNAL_SERVER_ERROR->value,
-                    $e->getMessage()
+                    $e->getMessage(),
                 );
 
             if ($response->hasHeader('Content-Type') === false) {
@@ -97,6 +96,10 @@ final class HttpKernel implements HttpKernelInterface
             }
 
             $response->getBody()->write($body);
+        } finally {
+            if ($response->hasHeader('Content-Type') === false) {
+                $response = $response->withHeader('Content-Type', 'text/html; charset=utf-8');
+            }
         }
 
         return $response;
@@ -115,29 +118,12 @@ final class HttpKernel implements HttpKernelInterface
         foreach ($acceptTypes as $acceptType) {
             $acceptTypeBase = trim(explode(';', $acceptType)[0]);
             $regex = '/^' . str_replace('\*', '.*', preg_quote($acceptTypeBase, '/')) . '$/';
-            
+
             if (preg_match($regex, $contentTypeBase) === 1) {
                 return true;
             }
         }
 
         return false;
-    }
-
-    /**
-     * Инициализация модулей
-     *
-     * @param array $modules
-     * @return void
-     */
-    private function initModules(array $modules): void
-    {
-        foreach ($modules as $module) {
-            if (is_subclass_of($module, ModuleInterface::class) === false) {
-                throw new \InvalidArgumentException("Модуль {$module} не реализует интерфейс " . ModuleInterface::class);
-            }
-
-            $this->container->call($module, 'init');
-        }
     }
 }

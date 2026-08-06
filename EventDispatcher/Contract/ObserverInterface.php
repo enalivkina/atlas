@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Atlas\EventDispatcher\Contract;
 
-use Atlas\EventDispatcher\Event;
+use Atlas\EventDispatcher\Message;
 
 interface ObserverInterface
 {
     /**
-     * @param Event $event
+     * @param Message $event
      */
-    public function observe(Event $event): void;
+    public function observe(Message $event): void;
 }

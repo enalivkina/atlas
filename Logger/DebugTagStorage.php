@@ -16,25 +16,12 @@ final class DebugTagStorage implements DebugTagStorageInterface
     private ?string $tag;
 
     /**
-     * @param DebugTagGenerator $debugTagGenerator
-     */
-    public function __construct(private readonly DebugTagGenerator $debugTagGenerator)
-    {
-        $this->tag = $this->debugTagGenerator->getTag();
-    }
-
-
-    /**
      * Получить значение тега
      *
-     * @return string
+     * @return string|null
      */
-    public function getTag(): string
+    public function getTag(): ?string
     {
-        if ($this->tag === null) {
-            throw new \RuntimeException('Тег отладки не определен');
-        }
-
         return $this->tag;
     }
 

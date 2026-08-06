@@ -7,37 +7,42 @@ namespace Atlas\Console\Plugin;
 use Atlas\Console\Contract\ConsoleInputInterface;
 use Atlas\Console\Contract\ConsoleInputPluginInterface;
 use Atlas\Console\Contract\ConsoleOutputInterface;
-use Atlas\Console\Dto\OptionDTO;
 use Atlas\Console\Enum\ConsoleEvent;
 use Atlas\EventDispatcher\Contract\EventDispatcherInterface;
 use Atlas\EventDispatcher\Contract\ObserverInterface;
-use Atlas\EventDispatcher\Event;
+use Atlas\EventDispatcher\Message;
 
 final class CommandDetachOptionPlugin implements ConsoleInputPluginInterface, ObserverInterface
 {
-    private OptionDTO $option;
+    private array $option;
 
     public function __construct(
+        private readonly ConsoleInputInterface $input,
         private readonly ConsoleOutputInterface $output,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
-        $this->option = new OptionDTO('detach', false, 'Перевод процесса в фон');
+        $this->option = [
+            'name' => 'detach',
+            'hasValue' => false,
+            'description' => 'Перевод процесса в фон',
+        ];
     }
 
-    public function init(ConsoleInputInterface $input, EventDispatcherInterface $dispatcher): void
+    public function init(): void
     {
-        $input->addDefaultOption($this->option);
+        $this->input->addDefaultOption($this->option['name'], $this->option['description']);
 
-        $dispatcher->attach(ConsoleEvent::INPUT_AFTER_PARSE->value, self::class);
+        $this->dispatcher->attach(ConsoleEvent::INPUT_AFTER_PARSE->value, $this);
     }
 
-    public function observe(Event $event): void
+    public function observe(Message $event): void
     {
         /**
          * @var ConsoleInputInterface $input
          */
         $input = $event->message;
 
-        if ($input->hasOption($this->option->name) === false) {
+        if ($input->hasOption($this->option['name']) === false) {
             return;
         }
 

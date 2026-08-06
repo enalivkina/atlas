@@ -2,7 +2,9 @@
 
 namespace Atlas\Resource\Query\File;
 
-final readonly class StatementParameter
+use Atlas\Resource\Query\StatementParameterInterface;
+
+final readonly class StatementParameter implements StatementParameterInterface
 {
     public function __construct(
         public string $resource,

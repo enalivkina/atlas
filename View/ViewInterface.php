@@ -6,6 +6,7 @@ namespace Atlas\View;
 
 interface ViewInterface
 {
+    public function setBasePath(string $path): void;
     /**
      * @param string $view
      * @param array $params

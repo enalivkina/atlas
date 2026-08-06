@@ -7,40 +7,39 @@ namespace Atlas\Console\Plugin;
 use Atlas\Console\Command\CommandDefinition;
 use Atlas\Console\Contract\ConsoleInputInterface;
 use Atlas\Console\Contract\ConsoleInputPluginInterface;
-use Atlas\Console\Contract\ConsoleKernelInterface;
 use Atlas\Console\Contract\ConsoleOutputInterface;
-use Atlas\Console\Dto\OptionDTO;
 use Atlas\Console\Enum\ConsoleEvent;
 use Atlas\EventDispatcher\Contract\EventDispatcherInterface;
 use Atlas\EventDispatcher\Contract\ObserverInterface;
-use Atlas\EventDispatcher\Event;
+use Atlas\EventDispatcher\Message;
 
 final class CommandHelpOptionPlugin implements ConsoleInputPluginInterface, ObserverInterface
 {
-    private OptionDTO $option;
+    private array $option;
 
     public function __construct(
+        private readonly ConsoleInputInterface $input,
         private readonly ConsoleOutputInterface $output,
-        private readonly ConsoleKernelInterface $kernel,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
-        $this->option = new OptionDTO('help', false, 'Вывод информации о команде');
+        $this->option = ['name' => 'help', 'hasValue' => false, 'description' => 'Вывод информации о команде'];
     }
 
-    public function init(ConsoleInputInterface $input, EventDispatcherInterface $dispatcher): void
+    public function init(): void
     {
-        $input->addDefaultOption($this->option);
+        $this->input->addDefaultOption($this->option['name'], $this->option['description']);
 
-        $dispatcher->attach(ConsoleEvent::INPUT_AFTER_PARSE->value, self::class);
+        $this->dispatcher->attach(ConsoleEvent::INPUT_AFTER_PARSE->value, $this);
     }
 
-    public function observe(Event $event): void
+    public function observe(Message $event): void
     {
         /**
          * @var ConsoleInputInterface $input
          */
         $input = $event->message;
 
-        if ($input->hasOption($this->option->name) === false) {
+        if ($input->hasOption($this->option['name']) === false) {
             return;
         }
 
@@ -52,7 +51,7 @@ final class CommandHelpOptionPlugin implements ConsoleInputPluginInterface, Obse
 
         $this->printOptionsInfo($command);
 
-        $this->kernel->terminate(0);
+        exit(0);
     }
 
     /**
@@ -95,16 +94,16 @@ final class CommandHelpOptionPlugin implements ConsoleInputPluginInterface, Obse
         foreach ($command->getArguments() as $argumentName) {
             $argument = $command->getArgumentDefinition($argumentName);
 
-            $this->output->success("  {$argument->name} ");
+            $this->output->success("  {$argument['name']} ");
 
-            if (is_null($argument->description) === false) {
-                $this->output->stdout("{$argument->description}, ");
+            if (is_null($argument['description']) === false) {
+                $this->output->stdout("{$argument['description']}, ");
             }
 
-            $this->output->stdout(($argument->required === false ? 'не ' : '') . 'обязательный параметр');
+            $this->output->stdout(($argument['required'] === false ? 'не ' : '') . 'обязательный параметр');
 
-            if (is_null($argument->default) === false) {
-                $this->output->stdout(", значение по умолчанию: {$argument->default} ");
+            if (is_null($argument['default']) === false) {
+                $this->output->stdout(", значение по умолчанию: {$argument['default']} ");
             }
 
             $this->output->writeLn();
@@ -127,14 +126,14 @@ final class CommandHelpOptionPlugin implements ConsoleInputPluginInterface, Obse
         foreach ($command->getOptions() as $optionName) {
             $option = $command->getOptionDefinition($optionName);
 
-            $this->output->success("  {$option->name} ");
+            $this->output->success("  {$option['name']} ");
 
-            if (is_null($option->description) === false) {
-                $this->output->stdout("$option->description. ");
+            if (is_null($option['description']) === false) {
+                $this->output->stdout("{$option['description']}. ");
             }
 
             $this->output->stdout("Является опцией");
-            $this->output->stdout($option->hasValue === false ? '-флагом' : ' с параметром');
+            $this->output->stdout($option['hasValue'] === false ? '-флагом' : ' с параметром');
 
             $this->output->writeLn();
         }

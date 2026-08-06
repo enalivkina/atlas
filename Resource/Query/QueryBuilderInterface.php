@@ -11,6 +11,7 @@ interface QueryBuilderInterface
     public function from(array|string $resource): static;
 
     public function where(array $condition): static;
+    public function whereIn(string $column, array $values): static;
 
     public function join(string $type, string|array $resource, string $on): static;
 
@@ -19,6 +20,8 @@ interface QueryBuilderInterface
     public function limit(int $limit): static;
 
     public function offset(int $offset): static;
+
+    public function getStatement(): StatementParameterInterface;
 
     public function reset(): static;
 }

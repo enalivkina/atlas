@@ -358,7 +358,7 @@ final class HttpKernelTest extends TestCase
             container: $this->container,
             modules: [
                 TestModule::class,
-            ]
+            ],
         );
     }
 
@@ -373,7 +373,7 @@ final class HttpKernelTest extends TestCase
             container: $this->container,
             modules: [
                 \stdClass::class,
-            ]
+            ],
         );
     }
 }
