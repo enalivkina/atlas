@@ -16,12 +16,12 @@ class Response extends Message implements ServerResponseInterface
         array $headers = [],
         string $protocolVersion = '1.1',
         private int $statusCode = 200,
-        private string $reasonPhrase = ''
+        private string $reasonPhrase = '',
     ) {
         parent::__construct(
             body: $body,
             headers: $headers,
-            protocolVersion: $protocolVersion
+            protocolVersion: $protocolVersion,
         );
 
         $this->reasonPhrase = $reasonPhrase === '' ? StatusCode::tryFrom($this->statusCode)?->reasonPhrase() : $reasonPhrase;
@@ -52,7 +52,7 @@ class Response extends Message implements ServerResponseInterface
             'HTTP/%s %d %s',
             $this->getProtocolVersion(),
             $this->getStatusCode(),
-            $this->getReasonPhrase()
+            $this->getReasonPhrase(),
         ));
 
         foreach ($this->headers as $name => $values) {

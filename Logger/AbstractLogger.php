@@ -12,10 +12,10 @@ abstract class AbstractLogger implements LoggerInterface
     /**
      * Логирование критической ошибки
      *
-     * @param mixed $message сообщение
+     * @param string $message сообщение
      * @return void
      */
-    public function critical(mixed $message): void
+    public function critical(string $message): void
     {
         $this->log(LogLevel::CRITICAL->value, $message);
     }
@@ -23,10 +23,10 @@ abstract class AbstractLogger implements LoggerInterface
     /**
      * Логирование ошибки
      *
-     * @param mixed $message сообщение
+     * @param string $message сообщение
      * @return void
      */
-    public function error(mixed $message): void
+    public function error(string $message): void
     {
         $this->log(LogLevel::ERROR->value, $message);
     }
@@ -34,10 +34,10 @@ abstract class AbstractLogger implements LoggerInterface
     /**
      * Логирование предупредительного сообщения
      *
-     * @param mixed $message сообщение
+     * @param string $message сообщение
      * @return void
      */
-    public function warning(mixed $message): void
+    public function warning(string $message): void
     {
         $this->log(LogLevel::WARNING->value, $message);
     }
@@ -45,10 +45,10 @@ abstract class AbstractLogger implements LoggerInterface
     /**
      * Логирование информационного сообщения
      *
-     * @param mixed $message сообщение
+     * @param string $message сообщение
      * @return void
      */
-    public function info(mixed $message): void
+    public function info(string $message): void
     {
         $this->log(LogLevel::INFO->value, $message);
     }
@@ -56,10 +56,10 @@ abstract class AbstractLogger implements LoggerInterface
     /**
      * Логирование сообщения отладки
      *
-     * @param mixed $message сообщение
+     * @param string $message сообщение
      * @return void
      */
-    public function debug(mixed $message): void
+    public function debug(string $message): void
     {
         $this->log(LogLevel::DEBUG->value, $message);
     }
@@ -68,10 +68,10 @@ abstract class AbstractLogger implements LoggerInterface
      * Форматирование строки логирования
      *
      * @param string $level уровень логирования
-     * @param mixed $message сообщение
+     * @param string $message сообщение
      * @return string
      */
-    abstract protected function formatMessage(string $level, mixed $message): string;
+    abstract protected function formatMessage(string $level, string $message): string;
 
     /**
      * Запись форматированного лога в вывод
@@ -85,10 +85,10 @@ abstract class AbstractLogger implements LoggerInterface
      * Запись лога в вывод
      *
      * @param string $level уровень логирования
-     * @param mixed $message сообщение
+     * @param string $message сообщение
      * @return void
      */
-    private function log(string $level, mixed $message): void
+    private function log(string $level, string $message): void
     {
         $log = $this->formatMessage($level, $message);
         $this->writeLog($log);

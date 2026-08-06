@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Atlas\Console\Contract;
 
 use Atlas\Console\Command\CommandDefinition;
-use Atlas\Console\Dto\OptionDTO;
 
 interface ConsoleInputInterface
 {
@@ -67,10 +66,11 @@ interface ConsoleInputInterface
     /**
      * Регистрация опции по-умолчанию
      *
-     * @param OptionDTO $optionDto
+     * @param string $name
+     * @param string $description
      * @return void
      */
-    public function addDefaultOption(OptionDTO $optionDto): void;
+    public function addDefaultOption(string $name, string $description): void;
 
     /**
      * Проверка наличия установленной опции вызова
@@ -81,19 +81,9 @@ interface ConsoleInputInterface
     public function hasOption(string $name): bool;
 
     /**
-     * Получение значения параметризированной опции
-     *
-     * @param string $name
-     * @return string|bool значение опции, либо bool:
-     * true, если опция не является параметризированной;
-     * false, если опция не задана
-     */
-    public function getOptionValue(string $name): string|bool;
-
-    /**
      * Получить опции по умолчанию
      *
-     * @return OptionDTO[]
+     * @return array
      */
     public function getDefaultOptions(): array;
 

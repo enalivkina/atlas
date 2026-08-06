@@ -10,19 +10,17 @@ interface ConsoleOutputInterface
      * Запись строку вывода в поток вывода
      *
      * @param string $message сообщение вывода
-     * @param array $format формат вывода (цвет, стиль)
      * @return void
      */
-    public function stdout(string $message, array $format = []): void;
+    public function stdout(string $message): void;
 
     /**
      * Запись строку вывода в поток вывода ошибок
      *
      * @param string $message сообщение вывода
-     * @param array $format формат вывода (цвет, стиль)
      * @return void
      */
-    public function stdErr(string $message, array $format = []): void;
+    public function stdErr(string $message): void;
 
     /**
      * Вывод сообщения об успехе операции

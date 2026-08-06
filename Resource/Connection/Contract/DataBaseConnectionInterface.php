@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Atlas\Resource\Connection\Contract;
 
-interface ConnectionInterface
+use Atlas\Resource\Query\QueryBuilderInterface;
+
+interface DataBaseConnectionInterface
 {
     public function select(QueryBuilderInterface $query): array;
 
@@ -16,15 +18,9 @@ interface ConnectionInterface
 
     public function update(string $resource, array $data, array $condition): int;
 
-    public function insert(string $resource, array $data): ?string;
+    public function insert(string $resource, array $data): int;
 
     public function delete(string $resource, array $condition): int;
 
     public function getLastInsertId(): string;
-
-    public function beginTransaction(): void;
-
-    public function commit(): void;
-
-    public function rollBack(): void;
 }

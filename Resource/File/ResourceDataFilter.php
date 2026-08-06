@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Atlas\Resource\File;
 
+use Atlas\Resource\Connection\Contract\DataBaseConnectionInterface;
 use Atlas\Resource\Contract\ResourceDataFilterInterface;
+use Atlas\Resource\Query\QueryBuilderInterface;
 use BadMethodCallException;
 
 final class ResourceDataFilter implements ResourceDataFilterInterface
@@ -14,8 +16,8 @@ final class ResourceDataFilter implements ResourceDataFilterInterface
     private ?array $accessibleFilters = null;
 
     public function __construct(
-        private readonly DataBaseConnectionInterface $databaseConnection,
-        private readonly FileQueryBuilderInterface $queryBuilder,
+        private readonly DataBaseConnectionInterface $connection,
+        private readonly QueryBuilderInterface $queryBuilder,
     ) {}
 
 
@@ -46,7 +48,7 @@ final class ResourceDataFilter implements ResourceDataFilterInterface
 
         $query = $this->buildQuery($condition);
 
-        return $this->databaseConnection->select($query);
+        return $this->connection->select($query);
     }
 
     public function filterOne(array $condition): array|null
@@ -55,7 +57,7 @@ final class ResourceDataFilter implements ResourceDataFilterInterface
 
         $query = $this->buildQuery($condition);
 
-        return $this->databaseConnection->selectOne($query);
+        return $this->connection->selectOne($query);
     }
 
     private function checkConditionOnAccessible(array $condition): void
@@ -87,7 +89,7 @@ final class ResourceDataFilter implements ResourceDataFilterInterface
         }
     }
 
-    private function buildQuery(array $condition): FileQueryBuilderInterface
+    private function buildQuery(array $condition): QueryBuilderInterface
     {
         $this->queryBuilder->select(empty($condition['fields']) === true ? $this->accessibleFields : $condition['fields']);
         $this->queryBuilder->from($this->resourceName);

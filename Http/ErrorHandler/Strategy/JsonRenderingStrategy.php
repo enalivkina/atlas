@@ -7,13 +7,13 @@ namespace Atlas\Http\ErrorHandler\Strategy;
 use Atlas\Container\ContainerInterface;
 use Atlas\Http\Contract\ServerResponseInterface;
 use Atlas\Http\Exceptions\HttpException;
-use Atlas\Logger\DebugTagStorage;
+use Atlas\Logger\Contract\DebugTagStorageInterface;
 use Throwable;
 
 final readonly class JsonRenderingStrategy implements RenderingStrategyInterface
 {
     public function __construct(
-        private DebugTagStorage $debugTagStorage,
+        private DebugTagStorageInterface $debugTagStorage,
         private ContainerInterface $container,
     ) {}
 
@@ -21,7 +21,7 @@ final readonly class JsonRenderingStrategy implements RenderingStrategyInterface
     {
         $response = $this->container->get(ServerResponseInterface::class);
         $response = $response->withHeader('Content-Type', 'application/json');
-        $this->container->registerSingleton(ServerResponseInterface::class, fn(): ServerResponseInterface => $response);
+        $this->container->registerSingleton(fn(): ServerResponseInterface => $response, ServerResponseInterface::class);
 
         $message = $throwable instanceof HttpException === true ? $throwable->getMessage() : $throwable->getMessage();
 

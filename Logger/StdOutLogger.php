@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Atlas\Logger;
 
+use Atlas\EventDispatcher\ClosureObserver;
+use Atlas\EventDispatcher\Contract\EventDispatcherInterface;
+use Atlas\EventDispatcher\Message;
 use Atlas\Logger\Enum\LogContextEvent;
 
 final class StdOutLogger extends AbstractLogger
@@ -27,7 +30,7 @@ final class StdOutLogger extends AbstractLogger
         $this->initEvents();
     }
 
-    protected function formatMessage(string $level, mixed $message): string
+    protected function formatMessage(string $level, string $message): string
     {
         $data = $this->processor->process(
             message: $message,
@@ -48,27 +51,27 @@ final class StdOutLogger extends AbstractLogger
     private function initEvents(): void
     {
         $listeners = [
-            LogContextEvent::ATTACH_CONTEXT->value => function (Message $event) {
-                $this->context[$event->message] = $event->message;
+            LogContextEvent::ATTACH_CONTEXT->value => function (Message $message) {
+                $this->context[$message->message] = $message->message;
             },
-            LogContextEvent::DETACH_CONTEXT->value => function (Message $event) {
-                if (isset($this->context[$event->message]) === false) {
+            LogContextEvent::DETACH_CONTEXT->value => function (Message $message) {
+                if (isset($this->context[$message->message]) === false) {
                     return;
                 }
 
-                unset($this->context[$event->message]);
+                unset($this->context[$message->message]);
             },
             LogContextEvent::FLUSH_CONTEXT->value => function () {
                 $this->context = [];
             },
-            LogContextEvent::ATTACH_EXTRAS->value => function (Message $event) {
-                $this->extras = $event->message;
+            LogContextEvent::ATTACH_EXTRAS->value => function (Message $message) {
+                $this->extras = $message->message;
             },
             LogContextEvent::FLUSH_EXTRAS->value => function () {
                 $this->extras = null;
             },
-            LogContextEvent::ATTACH_CATEGORY->value => function (Message $event) {
-                $this->category = $event->message;
+            LogContextEvent::ATTACH_CATEGORY->value => function (Message $message) {
+                $this->category = $message->message;
             },
             LogContextEvent::FLUSH_CATEGORY->value => function () {
                 $this->category = null;
@@ -76,7 +79,7 @@ final class StdOutLogger extends AbstractLogger
         ];
 
         foreach ($listeners as $event => $listener) {
-            $this->dispatcher->attach($event, $listener);
+            $this->dispatcher->attach($event, new ClosureObserver($listener));
         }
     }
 }

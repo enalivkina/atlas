@@ -2,17 +2,15 @@
 
 namespace Atlas\Http\ErrorHandler\Strategy;
 
-use Atlas\ConfigurationStorage\ConfigurationStorage;
 use Atlas\Http\Exceptions\HttpException;
-use Atlas\Logger\DebugTagStorage;
+use Atlas\Logger\Contract\DebugTagStorageInterface;
 use Atlas\View\ViewInterface;
 use Throwable;
 
 final readonly class HtmlRenderingStrategy implements RenderingStrategyInterface
 {
     public function __construct(
-        private DebugTagStorage $debugTagStorage,
-        private ConfigurationStorage $configurationStorage,
+        private DebugTagStorageInterface $debugTagStorage,
         private ViewInterface $view,
     ) {}
 
@@ -31,7 +29,7 @@ final readonly class HtmlRenderingStrategy implements RenderingStrategyInterface
             'type' => $type,
             'statusCode' => $statusCode,
             'xDebugTag' => $this->debugTagStorage->getTag(),
-            'showTrace' => (int) $this->configurationStorage->getOrDefault('DEBUG', 0) === 1,
+            'showTrace' => (int) getenv('DEBUG') === 1,
         ]);
     }
 }

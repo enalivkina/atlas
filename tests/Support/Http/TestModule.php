@@ -8,7 +8,5 @@ use Atlas\Common\Contract\ModuleInterface;
 
 final class TestModule implements ModuleInterface
 {
-    public function init(): void
-    {
-    }
+    public function init(): void {}
 }

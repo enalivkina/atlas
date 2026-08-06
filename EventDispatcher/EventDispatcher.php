@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Atlas\EventDispatcher;
 
-use Atlas\Container\ContainerInterface;
 use Atlas\EventDispatcher\Contract\EventDispatcherInterface;
 use Atlas\EventDispatcher\Contract\ObserverInterface;
-use Exception;
 
 final class EventDispatcher implements EventDispatcherInterface
 {
@@ -16,22 +14,24 @@ final class EventDispatcher implements EventDispatcherInterface
      */
     private array $observers = [];
 
-    public function __construct(
-        private readonly ContainerInterface $container,
-    ) {}
-
     /**
      * @inheritDoc
      */
-    public function configure(array $config): void
+
+    public function attach(string $event, ObserverInterface $observer): void
     {
-        foreach ($config as $eventName => $observers) {
-            if (is_array($observers) === false) {
-                throw new Exception("Наблюдатели для события {$eventName} должны быть массивом");
+        $this->observers[$event][] = $observer;
+    }
+
+    public function trigger(string $event, Message|null $message = null): void
+    {
+        foreach ($this->observers[$event] ?? [] as $observer) {
+            if (method_exists($observer, 'observe') === true) {
+                $observer->observe($event);
             }
 
-            foreach ($observers as $observer) {
-                $this->attach($eventName, $observer);
+            if (method_exists($observer, 'handle') === true) {
+                $observer->handle($event);
             }
         }
     }
@@ -39,55 +39,18 @@ final class EventDispatcher implements EventDispatcherInterface
     /**
      * @inheritDoc
      */
-
-    public function attach(string $eventName, string|callable $observer): void
+    public function detach(string $event): void
     {
-        if (is_callable($observer) === false) {
-            $implements = class_implements($observer);
-
-            if ($implements === false || (in_array(ObserverInterface::class, $implements, true)) === false) {
-                throw new Exception("Класс {$observer} должен реализовывать " . ObserverInterface::class);
-            }
-        }
-
-        $this->observers[$eventName][] = $observer;
-    }
-
-    public function trigger(string $eventName, Event $event): void
-    {
-        foreach ($this->observers[$eventName] ?? [] as $observer) {
-            if (is_callable($observer) === true) {
-                $observer($event);
-                continue;
-            }
-
-            $instance = $this->container->build($observer);
-
-            if (method_exists($instance, 'observe') === true) {
-                $instance->observe($event);
-            }
-
-            if (method_exists($instance, 'handle') === true) {
-                $instance->handle($event);
-            }
-        }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function detach(string $eventName, string|callable $observer): void
-    {
-        if (isset($this->observers[$eventName]) === false) {
+        if (isset($this->observers[$event]) === false) {
             return;
         }
 
-        $key = array_search($observer, $this->observers[$eventName], true);
+        $key = array_search($event, $this->observers[$event], true);
 
         if ($key === false) {
             return;
         }
 
-        unset($this->observers[$eventName][$key]);
+        unset($this->observers[$event][$key]);
     }
 }

@@ -6,5 +6,5 @@ namespace Atlas\Resource\Connection\Contract;
 
 interface ConnectionFactoryInterface
 {
-    public function createConnection(array $config): ConnectionInterface;
+    public function createConnection(array $config): DataBaseConnectionInterface;
 }

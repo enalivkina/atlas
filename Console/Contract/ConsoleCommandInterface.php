@@ -6,9 +6,10 @@ namespace Atlas\Console\Contract;
 
 interface ConsoleCommandInterface
 {
-    public function execute(ConsoleInputInterface $input, ConsoleOutputInterface $output): void;
+    public function execute(): void;
 
     public static function getSignature(): string;
 
     public static function getDescription(): string;
+    public function isHidden(): bool;
 }

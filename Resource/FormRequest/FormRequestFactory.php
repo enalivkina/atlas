@@ -8,6 +8,7 @@ use Atlas\Container\ContainerInterface;
 use Atlas\Resource\FormRequest\Contract\FormRequestFactoryInterface;
 use Atlas\Resource\FormRequest\Contract\FormRequestInterface;
 use InvalidArgumentException;
+use Psr\Http\Message\ServerRequestInterface;
 
 final readonly class FormRequestFactory implements FormRequestFactoryInterface
 {
@@ -34,7 +35,7 @@ final readonly class FormRequestFactory implements FormRequestFactoryInterface
             $form->addRule($rule[0], $rule[1]);
         }
 
-        $data = $this->request->getParsedBody()['attributes'] ?? [];
+        $data = $this->request->getParsedBody() ?? [];
 
         foreach ($form->getFields() as $fieldName) {
             if (isset($data[$fieldName]) === false) {

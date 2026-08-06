@@ -10,7 +10,7 @@ interface ResourceWriterInterface
 
     public function setAccessibleFields(array $fieldNames): static;
 
-    public function create(array $values): ?string;
+    public function create(array $values): int;
 
     public function update(string|int $id, array $values): int;
 

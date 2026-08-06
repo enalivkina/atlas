@@ -7,38 +7,38 @@ namespace Atlas\Console\Plugin;
 use Atlas\Console\Contract\ConsoleInputInterface;
 use Atlas\Console\Contract\ConsoleInputPluginInterface;
 use Atlas\Console\Contract\ConsoleOutputInterface;
-use Atlas\Console\Dto\ArgumentDTO;
-use Atlas\Console\Dto\OptionDTO;
 use Atlas\Console\Enum\ConsoleEvent;
 use Atlas\EventDispatcher\Contract\EventDispatcherInterface;
 use Atlas\EventDispatcher\Contract\ObserverInterface;
-use Atlas\EventDispatcher\Event;
+use Atlas\EventDispatcher\Message;
 
 final class CommandInteractiveOptionPlugin implements ConsoleInputPluginInterface, ObserverInterface
 {
-    private OptionDTO $option;
+    private array $option;
 
     public function __construct(
+        private readonly ConsoleInputInterface $input,
         private readonly ConsoleOutputInterface $output,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
-        $this->option = new OptionDTO('interactive', false, 'Интерактивный ввод аргументов');
+        $this->option = ['name' => 'interactive', 'hasValue' => false, 'description' => 'Интерактивный ввод аргументов'];
     }
 
-    public function init(ConsoleInputInterface $input, EventDispatcherInterface $dispatcher): void
+    public function init(): void
     {
-        $input->addDefaultOption($this->option);
+        $this->input->addDefaultOption($this->option['name'], $this->option['description']);
 
-        $dispatcher->attach(ConsoleEvent::INPUT_AFTER_PARSE->value, self::class);
+        $this->dispatcher->attach(ConsoleEvent::INPUT_AFTER_PARSE->value, $this);
     }
 
-    public function observe(Event $event): void
+    public function observe(Message $event): void
     {
         /**
          * @var ConsoleInputInterface $input
          */
         $input = $event->message;
 
-        if ($input->hasOption($this->option->name) === false) {
+        if ($input->hasOption($this->option['name']) === false) {
             return;
         }
 
@@ -49,7 +49,7 @@ final class CommandInteractiveOptionPlugin implements ConsoleInputPluginInterfac
 
             $this->printArgumentInfo($argument);
 
-            $value = $argument->default;
+            $value = $argument['default'];
             $userInput = trim(fgets(STDIN));
 
             if (strlen($userInput) !== 0) {
@@ -65,19 +65,19 @@ final class CommandInteractiveOptionPlugin implements ConsoleInputPluginInterfac
     /**
      * Печать строки запроса ввода агрумента
      *
-     * @param ArgumentDTO $argument
+     * @param array $argument
      * @return void
      */
-    private function printArgumentInfo(ArgumentDTO $argument): void
+    private function printArgumentInfo(array $argument): void
     {
-        $this->output->success("Введите аргумент {$argument->name}");
+        $this->output->success("Введите аргумент {$argument['name']}");
 
-        if ($argument->description !== '') {
-            $this->output->success(" ({$argument->description})");
+        if ($argument['description'] !== '') {
+            $this->output->success(" ({$argument['description']})");
         }
 
-        if (is_null($argument->default) === false) {
-            $this->output->success(" [{$argument->default}]");
+        if (is_null($argument['default']) === false) {
+            $this->output->success(" [{$argument['default']}]");
         }
 
         $this->output->success(':');

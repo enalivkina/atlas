@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Atlas\Common;
 
-use Atlas\ConfigurationStorage\ConfigurationStorage;
+use Atlas\ConfigurationStorage\ConfigurationStorageInterface;
 
 final class AliasManager
 {
@@ -15,7 +15,7 @@ final class AliasManager
         'modules',
     ];
 
-    public function __construct(ConfigurationStorage $configurationStorage)
+    public function __construct(ConfigurationStorageInterface $configurationStorage)
     {
         $this->aliases = $configurationStorage->get('aliases');
 

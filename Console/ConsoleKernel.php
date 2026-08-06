@@ -6,7 +6,6 @@ namespace Atlas\Console;
 
 use Atlas\Common\AliasManager;
 use Atlas\Common\Contract\ErrorHandlerInterface;
-use Atlas\Common\Contract\ModuleInterface;
 use Atlas\Console\Command\CommandDefinition;
 use Atlas\Console\Command\ListCommand;
 use Atlas\Console\Contract\ConsoleCommandInterface;
@@ -31,11 +30,8 @@ final class ConsoleKernel implements ConsoleKernelInterface
         private readonly AliasManager $aliasManager,
         private readonly ?string $appName = null,
         private readonly ?string $version = null,
-        private readonly array $inputPlugins = [],
-        array $modules = [],
     ) {
         $this->initDefaultCommands();
-        $this->initModules($modules);
     }
 
     public function getAppName(): ?string
@@ -68,15 +64,13 @@ final class ConsoleKernel implements ConsoleKernelInterface
             $commandName = $this->commandMap[$commandFullName[0]][$commandFullName[1]]
                 ?? throw new \InvalidArgumentException(sprintf("Команда %s не найдена", implode(':', $commandFullName)));
 
-            $this->input->addPlugins($this->inputPlugins);
-
             $command = $this->container->get($commandName);
             $this->input->bindDefinitions($command);
             $command->execute($this->input, $this->output);
         } catch (\Throwable $e) {
             $this->output->stdErr($this->errorHandler->handle($e));
 
-            $this->logger->error($e);
+            $this->logger->error($e->getMessage());
 
             return ExitCode::ERROR->value;
         }
@@ -150,23 +144,6 @@ final class ConsoleKernel implements ConsoleKernelInterface
 
         foreach ($defaultCommands as $className) {
             $this->registerCommand($className);
-        }
-    }
-
-    /**
-     * Инициализация модулей
-     *
-     * @param array $modules
-     * @return void
-     */
-    private function initModules(array $modules): void
-    {
-        foreach ($modules as $module) {
-            if (is_subclass_of($module, ModuleInterface::class) === false) {
-                throw new \InvalidArgumentException("Модуль {$module} не реализует интерфейс " . ModuleInterface::class);
-            }
-
-            $this->container->call($module, 'init');
         }
     }
 }
