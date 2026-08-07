@@ -102,7 +102,8 @@ final class HttpKernel implements HttpKernelInterface
             $observer = $this->container->get(KernelRequestObserver::class);
 
             $this->eventDispatcher->attach(KernelEvent::REQUEST->value, $observer);
-        } finally {}
+        } finally {
+        }
 
         return $response;
     }

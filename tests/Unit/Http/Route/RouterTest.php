@@ -224,7 +224,7 @@ final class RouterTest extends TestCase
 
                         $router->get(
                             '/users',
-                            TestController::class .'::index',
+                            TestController::class . '::index',
                         );
                     },
                 );

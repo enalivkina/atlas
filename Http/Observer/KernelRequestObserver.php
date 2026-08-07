@@ -7,9 +7,5 @@ use Atlas\EventDispatcher\Message;
 
 final class KernelRequestObserver implements ObserverInterface
 {
-
-    public function observe(Message $event): void
-    {
-
-    }
+    public function observe(Message $event): void {}
 }

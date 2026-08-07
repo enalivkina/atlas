@@ -93,7 +93,7 @@ final class DbQueryBuilderTest extends TestCase
     {
         $this->builder->select('*')->from('users')->where([
             'status' => 'active',
-            'age' => 25
+            'age' => 25,
         ]);
         $statement = $this->builder->getStatement();
         $this->assertEquals('SELECT `users`.* FROM `users` WHERE `users`.`status` = :where_0 AND `users`.`age` = :where_1', $statement->sql);
@@ -105,12 +105,12 @@ final class DbQueryBuilderTest extends TestCase
         $this->builder->select('*')->from('users')->where([
             'age' => [Operator::GT->value => 18],
             'score' => [Operator::LTE->value => 100],
-            'name' => [Operator::LIKE->value => 'john']
+            'name' => [Operator::LIKE->value => 'john'],
         ]);
         $statement = $this->builder->getStatement();
         $this->assertEquals(
             'SELECT `users`.* FROM `users` WHERE `users`.`age` > :where_0 AND `users`.`score` <= :where_1 AND `users`.`name` LIKE :where_2',
-            $statement->sql
+            $statement->sql,
         );
         $this->assertEquals(['where_0' => 18, 'where_1' => 100, 'where_2' => '%john%'], $statement->bindings);
     }
@@ -118,12 +118,12 @@ final class DbQueryBuilderTest extends TestCase
     public function testWhereWithInOperator(): void
     {
         $this->builder->select('*')->from('users')->where([
-            'status' => [Operator::IN->value => ['active', 'pending', 'approved']]
+            'status' => [Operator::IN->value => ['active', 'pending', 'approved']],
         ]);
         $statement = $this->builder->getStatement();
         $this->assertEquals(
             'SELECT `users`.* FROM `users` WHERE `users`.`status` IN (:where_0, :where_1, :where_2)',
-            $statement->sql
+            $statement->sql,
         );
         $this->assertEquals(['where_0' => 'active', 'where_1' => 'pending', 'where_2' => 'approved'], $statement->bindings);
     }
@@ -131,12 +131,12 @@ final class DbQueryBuilderTest extends TestCase
     public function testWhereWithNotInOperator(): void
     {
         $this->builder->select('*')->from('users')->where([
-            'status' => [Operator::NIN->value => ['deleted', 'banned']]
+            'status' => [Operator::NIN->value => ['deleted', 'banned']],
         ]);
         $statement = $this->builder->getStatement();
         $this->assertEquals(
             'SELECT `users`.* FROM `users` WHERE `users`.`status` NOT IN (:where_0, :where_1)',
-            $statement->sql
+            $statement->sql,
         );
         $this->assertEquals(['where_0' => 'deleted', 'where_1' => 'banned'], $statement->bindings);
     }
@@ -159,7 +159,7 @@ final class DbQueryBuilderTest extends TestCase
     public function testWhereWithNotNullValue(): void
     {
         $this->builder->select('*')->from('users')->where([
-            'deleted_at' => [Operator::NE->value => null]
+            'deleted_at' => [Operator::NE->value => null],
         ]);
         $statement = $this->builder->getStatement();
         $this->assertEquals('SELECT `users`.* FROM `users` WHERE `users`.`deleted_at` IS NOT NULL', $statement->sql);
@@ -190,7 +190,7 @@ final class DbQueryBuilderTest extends TestCase
         $statement = $this->builder->getStatement();
         $this->assertEquals(
             'SELECT `users`.* FROM `users` INNER JOIN `orders` ON users.id = orders.user_id',
-            $statement->sql
+            $statement->sql,
         );
     }
 
@@ -203,7 +203,7 @@ final class DbQueryBuilderTest extends TestCase
         $statement = $this->builder->getStatement();
         $this->assertEquals(
             'SELECT `users`.* FROM `users` LEFT JOIN `orders` AS `o` ON users.id = o.user_id',
-            $statement->sql
+            $statement->sql,
         );
     }
 
@@ -224,7 +224,7 @@ final class DbQueryBuilderTest extends TestCase
         $statement = $this->builder->getStatement();
         $this->assertEquals(
             'SELECT `users`.* FROM `users` INNER JOIN `orders` ON users.id = orders.user_id LEFT JOIN `products` ON orders.product_id = products.id',
-            $statement->sql
+            $statement->sql,
         );
     }
 
@@ -240,12 +240,12 @@ final class DbQueryBuilderTest extends TestCase
         $this->builder->select('*')->from('users')->orderBy([
             'name' => 'ASC',
             'age' => 'DESC',
-            'created_at' => 'ASC'
+            'created_at' => 'ASC',
         ]);
         $statement = $this->builder->getStatement();
         $this->assertEquals(
             'SELECT `users`.* FROM `users` ORDER BY `name` ASC, `age` DESC, `created_at` ASC',
-            $statement->sql
+            $statement->sql,
         );
     }
 
@@ -398,7 +398,7 @@ final class DbQueryBuilderTest extends TestCase
         $statement = $this->builder->getStatement();
         $this->assertEquals(
             'SELECT `users`.`field-with-dash`, `users`.`field with space` FROM `users`',
-            $statement->sql
+            $statement->sql,
         );
     }
 
@@ -410,7 +410,7 @@ final class DbQueryBuilderTest extends TestCase
         $statement = $this->builder->getStatement();
         $this->assertEquals(
             'SELECT `users`.`field``with``backticks` FROM `users`',
-            $statement->sql
+            $statement->sql,
         );
     }
 
@@ -424,7 +424,7 @@ final class DbQueryBuilderTest extends TestCase
                 'u.status' => 'active',
                 'u.age' => [Operator::GTE->value => 18],
                 'o.status' => [Operator::IN->value => ['completed', 'shipped']],
-                'u.deleted_at' => null
+                'u.deleted_at' => null,
             ])
             ->orderBy(['u.name' => 'ASC', 'o.created_at' => 'DESC'])
             ->limit(20)
@@ -437,7 +437,7 @@ final class DbQueryBuilderTest extends TestCase
         $this->assertEquals($expectedSql, $statement->sql);
         $this->assertEquals(
             ['where_0' => 'active', 'where_1' => 18, 'where_2' => 'completed', 'where_3' => 'shipped'],
-            $statement->bindings
+            $statement->bindings,
         );
     }
 }
