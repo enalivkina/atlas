@@ -8,9 +8,11 @@ use Atlas\Common\Contract\ErrorHandlerInterface;
 use Atlas\Container\ContainerInterface;
 use Atlas\EventDispatcher\Contract\EventDispatcherInterface;
 use Atlas\Http\Contract\HTTPKernelInterface;
+use Atlas\Http\Enum\KernelEvent;
 use Atlas\Http\Enum\StatusCode;
 use Atlas\Http\Exceptions\HttpException;
 use Atlas\Http\Exceptions\HttpNotAcceptableException;
+use Atlas\Http\Observer\KernelRequestObserver;
 use Atlas\Http\Router\Contract\HttpRouterInterface;
 use Atlas\Logger\Contract\LoggerInterface;
 use Atlas\Http\Contract\ServerResponseInterface;
@@ -96,11 +98,11 @@ final class HttpKernel implements HttpKernelInterface
             }
 
             $response->getBody()->write($body);
-        } finally {
-            if ($response->hasHeader('Content-Type') === false) {
-                $response = $response->withHeader('Content-Type', 'text/html; charset=utf-8');
-            }
-        }
+
+            $observer = $this->container->get(KernelRequestObserver::class);
+
+            $this->eventDispatcher->attach(KernelEvent::REQUEST->value, $observer);
+        } finally {}
 
         return $response;
     }

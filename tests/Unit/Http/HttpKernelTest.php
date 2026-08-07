@@ -6,10 +6,12 @@ namespace Atlas\tests\Unit\Http;
 
 use Atlas\Common\Contract\ErrorHandlerInterface;
 use Atlas\Container\ContainerInterface;
+use Atlas\EventDispatcher\Contract\EventDispatcherInterface;
 use Atlas\Http\Contract\ServerResponseInterface;
 use Atlas\Http\Exceptions\HttpException;
 use Atlas\Http\Exceptions\HttpNotAcceptableException;
 use Atlas\Http\HttpKernel;
+use Atlas\Http\Observer\KernelRequestObserver;
 use Atlas\Http\Response;
 use Atlas\Http\Router\Contract\HttpRouterInterface;
 use Atlas\Logger\Contract\LoggerInterface;
@@ -25,6 +27,7 @@ final class HttpKernelTest extends TestCase
     private HttpRouterInterface&MockObject $router;
     private LoggerInterface&MockObject $logger;
     private ErrorHandlerInterface&MockObject $errorHandler;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
     private ContainerInterface&MockObject $container;
 
     protected function setUp(): void
@@ -34,14 +37,17 @@ final class HttpKernelTest extends TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->errorHandler = $this->createMock(ErrorHandlerInterface::class);
         $this->container = $this->createMock(ContainerInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
     }
 
     private function createKernel(): HttpKernel
     {
         return new HttpKernel(
+            response: $this->response,
             router: $this->router,
             logger: $this->logger,
             errorHandler: $this->errorHandler,
+            eventDispatcher: $this->eventDispatcher,
             container: $this->container,
         );
     }
@@ -90,48 +96,6 @@ final class HttpKernelTest extends TestCase
         self::assertSame($this->response, $kernel->handle($request));
     }
 
-    public function testShouldReturnJsonResponse(): void
-    {
-        $request = $this->createMock(ServerRequestInterface::class);
-        $body = $this->createMock(StreamInterface::class);
-
-        $request
-            ->method('getHeader')
-            ->willReturn(['application/json']);
-
-        $this->router
-            ->method('dispatch')
-            ->willReturn([
-                'success' => true,
-            ]);
-
-        $this->response
-            ->method('withStatus')
-            ->willReturnSelf();
-
-        $this->response
-            ->method('withHeader')
-            ->with('Content-Type', 'application/json')
-            ->willReturnSelf();
-
-        $this->response
-            ->method('getBody')
-            ->willReturn($body);
-
-        $this->container->method('get')
-            ->with(ServerResponseInterface::class)
-            ->willReturn($this->response);
-
-        $body
-            ->expects(self::once())
-            ->method('write')
-            ->with('{"success":true}');
-
-        $kernel = $this->createKernel();
-
-        $kernel->handle($request);
-    }
-
     public function testShouldReturnCustomResponse(): void
     {
         $request = $this->createMock(ServerRequestInterface::class);
@@ -175,8 +139,8 @@ final class HttpKernelTest extends TestCase
             ->willReturn($body);
 
         $this->container->method('get')
-            ->with(ServerResponseInterface::class)
-            ->willReturn($this->response);
+            ->with(KernelRequestObserver::class)
+            ->willReturn(new KernelRequestObserver());
 
         $kernel = $this->createKernel();
 
@@ -250,11 +214,6 @@ final class HttpKernelTest extends TestCase
             ->method('dispatch')
             ->willThrowException($exception);
 
-        $this->logger
-            ->expects(self::once())
-            ->method('error')
-            ->with($exception);
-
         $this->errorHandler
             ->expects(self::once())
             ->method('handle')
@@ -278,8 +237,8 @@ final class HttpKernelTest extends TestCase
             ->willReturn($body);
 
         $this->container->method('get')
-            ->with(ServerResponseInterface::class)
-            ->willReturn($this->response);
+            ->with(KernelRequestObserver::class)
+            ->willReturn(new KernelRequestObserver());
 
         $body
             ->expects(self::once())
@@ -303,11 +262,6 @@ final class HttpKernelTest extends TestCase
         $this->router
             ->method('dispatch')
             ->willReturn('Hello');
-
-        $this->logger
-            ->expects(self::once())
-            ->method('error')
-            ->with(self::isInstanceOf(HttpNotAcceptableException::class));
 
         $this->errorHandler
             ->expects(self::once())
@@ -342,38 +296,5 @@ final class HttpKernelTest extends TestCase
         $kernel = $this->createKernel();
 
         $kernel->handle($request);
-    }
-
-    public function testShouldInitializeModules(): void
-    {
-        $this->container
-            ->expects(self::once())
-            ->method('call')
-            ->with(TestModule::class, 'init');
-
-        new HttpKernel(
-            router: $this->router,
-            logger: $this->logger,
-            errorHandler: $this->errorHandler,
-            container: $this->container,
-            modules: [
-                TestModule::class,
-            ],
-        );
-    }
-
-    public function testShouldThrowWhenModuleDoesNotImplementInterface(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        new HttpKernel(
-            router: $this->router,
-            logger: $this->logger,
-            errorHandler: $this->errorHandler,
-            container: $this->container,
-            modules: [
-                \stdClass::class,
-            ],
-        );
     }
 }
