@@ -7,7 +7,6 @@ namespace Atlas\tests\Unit\Resource\Db;
 use Atlas\Resource\Connection\Contract\DataBaseConnectionInterface;
 use Atlas\Resource\Db\ResourceDataFilter;
 use Atlas\Resource\Query\MySql\DbQueryBuilder;
-use Atlas\Resource\Query\MySql\StatementParameter;
 use Atlas\Resource\Query\QueryBuilderInterface;
 use Atlas\Resource\Query\StatementParameterInterface;
 use Codeception\PHPUnit\TestCase;
@@ -35,14 +34,14 @@ final class ResourceDataFilterTest extends TestCase
         );
 
         $this->filter
-            ->setResourceName('users.json')
+            ->setResourceName('users')
             ->setAccessibleFields(['id', 'name', 'email', 'age', 'status'])
             ->setAccessibleFilters(['id', 'name', 'email', 'age', 'status']);
     }
 
     public function testSetResourceName(): void
     {
-        $result = $this->filter->setResourceName('products.json');
+        $result = $this->filter->setResourceName('products');
         $this->assertSame($this->filter, $result);
     }
 
@@ -240,7 +239,6 @@ final class ResourceDataFilterTest extends TestCase
 
         $this->connection->method('select')->willReturn([]);
 
-        // Не должно выбрасывать исключение
         $this->filter->filterAll($condition);
         $this->assertTrue(true);
     }
@@ -306,7 +304,6 @@ final class ResourceDataFilterTest extends TestCase
 
         $this->connection->method('select')->willReturn([]);
 
-        // Не должно выбрасывать исключение
         $this->filter->filterAll($condition);
         $this->assertTrue(true);
     }
@@ -319,7 +316,6 @@ final class ResourceDataFilterTest extends TestCase
 
         $this->connection->method('select')->willReturn([]);
 
-        // Проверяем, что дубликаты не вызывают проблем
         $this->filter->filterAll($condition);
         $this->assertTrue(true);
     }
