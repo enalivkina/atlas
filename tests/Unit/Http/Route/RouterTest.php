@@ -28,7 +28,7 @@ final class RouterTest extends TestCase
     {
         $route = $this->router->get(
             '/users',
-            [TestController::class, 'index'],
+            TestController::class . '::index',
         );
 
         self::assertInstanceOf(Route::class, $route);
@@ -45,7 +45,7 @@ final class RouterTest extends TestCase
     {
         $this->router->post(
             '/users',
-            [TestController::class, 'store'],
+            TestController::class . '::store',
         );
 
         self::assertTrue(
@@ -57,7 +57,7 @@ final class RouterTest extends TestCase
     {
         $this->router->put(
             '/users',
-            [TestController::class, 'update'],
+            TestController::class . '::update',
         );
 
         self::assertTrue(
@@ -69,7 +69,7 @@ final class RouterTest extends TestCase
     {
         $this->router->patch(
             '/users',
-            [TestController::class, 'patch'],
+            TestController::class . '::patch',
         );
 
         self::assertTrue(
@@ -81,7 +81,7 @@ final class RouterTest extends TestCase
     {
         $this->router->delete(
             '/users',
-            [TestController::class, 'delete'],
+            TestController::class . '::delete',
         );
 
         self::assertTrue(
@@ -100,7 +100,7 @@ final class RouterTest extends TestCase
     {
         $this->router->get(
             '/users',
-            [TestController::class, 'index'],
+            TestController::class . '::index',
         );
 
         self::assertTrue(
@@ -112,7 +112,7 @@ final class RouterTest extends TestCase
     {
         $this->router->get(
             '/users/{:id}',
-            [TestController::class, 'show'],
+            TestController::class . '::show',
         );
 
         self::assertTrue(
@@ -128,7 +128,7 @@ final class RouterTest extends TestCase
     {
         $route = $this->router->get(
             '/users/{:id}',
-            [TestController::class, 'show'],
+            TestController::class . '::show',
         );
 
         self::assertMatchesRegularExpression(
@@ -141,7 +141,7 @@ final class RouterTest extends TestCase
     {
         $route = $this->router->get(
             '/users/{:id|int}',
-            [TestController::class, 'show'],
+            TestController::class . '::show',
         );
 
         self::assertSame(
@@ -161,7 +161,7 @@ final class RouterTest extends TestCase
     {
         $route = $this->router->get(
             '/users/{?:page|int=1}',
-            [TestController::class, 'show'],
+            TestController::class . '::show',
         );
 
         self::assertSame(
@@ -183,7 +183,7 @@ final class RouterTest extends TestCase
 
         $route = $this->router->get(
             '/users',
-            [TestController::class, 'index'],
+            TestController::class . '::index',
         );
 
         self::assertSame(
@@ -199,7 +199,7 @@ final class RouterTest extends TestCase
             function (Router $router): void {
                 $router->get(
                     '/users',
-                    [TestController::class, 'index'],
+                    TestController::class . '::index',
                 );
             },
         );
@@ -224,7 +224,7 @@ final class RouterTest extends TestCase
 
                         $router->get(
                             '/users',
-                            [TestController::class, 'index'],
+                            TestController::class . '::index',
                         );
                     },
                 );
