@@ -2,7 +2,12 @@
   "name": "framework-education/atlas",
   "autoload": {
     "psr-4": {
-      "Atlas\\": ""
+      "Atlas\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Atlas\\tests\\": "tests/"
     }
   },
   "authors": [

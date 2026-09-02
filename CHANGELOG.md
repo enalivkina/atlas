@@ -5,6 +5,11 @@
 Формат основан на [стандарте формата CHANGELOG](https://keepachangelog.com/en/1.0.0/),
 и придерживается [правил версионирования](https://semver.org/spec/v2.0.0.html).
 
+## [ [0.3.0](https://github.com/enalivkina/atlas/tags/0.3.0)] - 02.09.2026
+
+- Изменено:
+  - Структура пакета
+
 ## [ [0.2.0](https://github.com/enalivkina/atlas/tags/0.2.0)] - 12.08.2026
 
 - Реализовано:
