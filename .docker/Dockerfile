@@ -9,7 +9,7 @@ ENV COMPOSER_MEMORY_LIMIT='-1'
 COPY --from=mlocati/php-extension-installer:2.11.12 /usr/bin/install-php-extensions /usr/local/bin/
 
 RUN pear update-channels && pecl update-channels && install-php-extensions @composer-2 \
-    pdo_pgsql pgsql intl gd opcache zip rdkafka redis
+    pdo_pgsql pgsql intl gd opcache zip rdkafka redis pcntl
 
 COPY ./.docker/php/php.ini-production $PHP_INI_DIR/php.ini
 
